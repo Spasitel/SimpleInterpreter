@@ -1,5 +1,5 @@
-// Generated from C:/workspace/SimpleInterpreter/src/main/resources\simple.g4 by ANTLR 4.7.2
-package ru.jetbrains.antlr.gen;
+// Generated from C:/workspace/SimpleInterpreter/src/main/resources\Simple.g4 by ANTLR 4.7.2
+package ru.jetbrains.model.antlrGen;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -10,7 +10,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class simpleLexer extends Lexer {
+public class SimpleLexer extends Lexer {
 	static { RuntimeMetaData.checkVersion("4.7.2", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
@@ -19,7 +19,7 @@ public class simpleLexer extends Lexer {
 	public static final int
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, STRING=9, 
 		LPAREN=10, RPAREN=11, PLUS=12, MINUS=13, TIMES=14, DIV=15, EQ=16, COMMA=17, 
-		POINT=18, POW=19, CONSTANT=20, VARIABLE_NAME=21, WS=22;
+		POINT=18, POW=19, CONST=20, VARIABLE_NAME=21, WS=22;
 	public static String[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
 	};
@@ -32,8 +32,7 @@ public class simpleLexer extends Lexer {
 		return new String[] {
 			"T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "T__7", "STRING", 
 			"LPAREN", "RPAREN", "PLUS", "MINUS", "TIMES", "DIV", "EQ", "COMMA", "POINT", 
-			"POW", "CONSTANT", "VARIABLE_NAME", "VALID_ID_START", "VALID_ID_CHAR", 
-			"WS"
+			"POW", "CONST", "VARIABLE_NAME", "VALID_ID_START", "VALID_ID_CHAR", "WS"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
@@ -50,7 +49,7 @@ public class simpleLexer extends Lexer {
 		return new String[] {
 			null, null, null, null, null, null, null, null, null, "STRING", "LPAREN", 
 			"RPAREN", "PLUS", "MINUS", "TIMES", "DIV", "EQ", "COMMA", "POINT", "POW", 
-			"CONSTANT", "VARIABLE_NAME", "WS"
+			"CONST", "VARIABLE_NAME", "WS"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -88,13 +87,13 @@ public class simpleLexer extends Lexer {
 	}
 
 
-	public simpleLexer(CharStream input) {
+	public SimpleLexer(CharStream input) {
 		super(input);
 		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
 	@Override
-	public String getGrammarFileName() { return "simple.g4"; }
+	public String getGrammarFileName() { return "Simple.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

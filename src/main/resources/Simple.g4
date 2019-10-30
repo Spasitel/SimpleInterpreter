@@ -1,4 +1,4 @@
-grammar simple;
+grammar Simple;
 
 program
     : stmt+ EOF ;
@@ -33,10 +33,18 @@ sequence_def
     : '{' numerical COMMA numerical '}' ;
 
 map
-    : 'map('sequence COMMA VARIABLE_NAME '->' numerical ')' ;
+    : 'map('sequence COMMA unaryLambda ')' ;
+
+unaryLambda
+    : VARIABLE_NAME '->' numerical
+    ;
 
 reduce
-    : 'reduce('sequence COMMA numerical COMMA VARIABLE_NAME VARIABLE_NAME '->' numerical ')' ;
+    : 'reduce('sequence COMMA numerical COMMA binaryLambda ')' ;
+
+binaryLambda
+    : VARIABLE_NAME VARIABLE_NAME '->' numerical
+    ;
 
 numerical
    : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
@@ -57,13 +65,17 @@ signedAtom
 
 atom
    : variable
-   | CONSTANT
+   | constant
    | reduce
    | LPAREN numerical RPAREN
    ;
 
 variable
     : VARIABLE_NAME;
+
+constant
+    : CONST
+    ;
 
 LPAREN
    : '('
@@ -112,7 +124,7 @@ POW
    : '^'
    ;
 
-CONSTANT
+CONST
    : ('0' .. '9') + ('.' ('0' .. '9') +)?
    ;
 
