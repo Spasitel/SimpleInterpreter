@@ -1,11 +1,9 @@
 package ru.jetbrains.model.data;
 
-import java.util.function.DoubleBinaryOperator;
-
 public class BinaryLambda implements Data {
-    private final DoubleBinaryOperator operator;
+    private final DoubleBiFunction<?> operator;
 
-    public BinaryLambda(DoubleBinaryOperator operator) {
+    public BinaryLambda(DoubleBiFunction<?> operator) {
         this.operator = operator;
     }
 
@@ -14,7 +12,7 @@ public class BinaryLambda implements Data {
         return DataType.BINARY_LAMBDA;
     }
 
-    public DoubleBinaryOperator getOperator() {
+    public DoubleBiFunction<?> getOperator() {
         return operator;
     }
 }

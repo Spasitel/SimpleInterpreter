@@ -15,13 +15,19 @@ public class Interpreter {
         SimpleLexer lex = new SimpleLexer(input); // transforms characters into tokens
         CommonTokenStream tokens = new CommonTokenStream(lex); // a token stream
         SimpleParser parser = new SimpleParser(tokens); // transforms tokens into parse trees
-        ProgramState programState = new ProgramState();
-        parser.addParseListener(new InterpreterListener(programState));
+        ErrorListener listener = new ErrorListener();
+        parser.addParseListener(listener);
+        SimpleParser.ProgramContext tree = null;
         try {
-            parser.program();
-        } catch (IllegalArgumentException e){
+            tree = parser.program();
+        } catch (IllegalArgumentException e) {
             //TODO
         }
+        //TODO check listener
+        ProgramState programState = new ProgramState();
+        InterpreterVisitor interpreterVisitor = new InterpreterVisitor(programState);
+        interpreterVisitor.visit(tree);
+
         return programState.getResult();
     }
 }

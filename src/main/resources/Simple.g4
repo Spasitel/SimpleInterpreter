@@ -47,28 +47,14 @@ binaryLambda
     ;
 
 numerical
-   : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
-   ;
-
-multiplyingExpression
-   : powExpression ((TIMES | DIV) powExpression)*
-   ;
-
-powExpression
-   : signedAtom (POW signedAtom)*
-   ;
-
-signedAtom
-   : MINUS atom
-   | atom
-   ;
-
-atom
-   : variable
-   | constant
-   | reduce
-   | LPAREN numerical RPAREN
-   ;
+    : (MINUS)? LPAREN numerical RPAREN          #signedNum
+    | <assoc=right> numerical POW numerical     #powNum
+    | numerical (TIMES | DIV) numerical         #mulNum
+    | numerical (PLUS | MINUS) numerical        #plusNum
+    | (MINUS)? constant                         #signedNum
+    | (MINUS)? reduce                           #signedNum
+    | (MINUS)? variable                         #signedNum
+    ;
 
 variable
     : VARIABLE_NAME;

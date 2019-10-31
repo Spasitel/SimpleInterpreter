@@ -7,9 +7,11 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Test;
 import ru.jetbrains.model.antlrGen.SimpleLexer;
 import ru.jetbrains.model.antlrGen.SimpleParser;
+import ru.jetbrains.model.data.Data;
+import ru.jetbrains.model.data.DataType;
 import ru.jetbrains.model.data.Numerical;
-import ru.jetbrains.model.state.Context;
 import ru.jetbrains.model.state.ProgramState;
+import ru.jetbrains.model.state.ReturnType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,19 +20,21 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class InterpreterListenerTest {
+public class InterpreterVisitorTest {
     @Test
     public void constantTest() {
         CharStream input = CharStreams.fromString("500.12");
         SimpleLexer lex = new SimpleLexer(input); // transforms characters into tokens
         CommonTokenStream tokens = new CommonTokenStream(lex); // a token stream
         SimpleParser parser = new SimpleParser(tokens); // transforms tokens into parse trees
-        ProgramState state = new ProgramState();
-        parser.addParseListener(new InterpreterListener(state));
-        Context item = mock(Context.class);
-        state.getASTStack().push(item);
-        parser.constant();
-        verify(item).accept(new Numerical(500.12));
+        ParseTree tree =  parser.constant();
+
+        ProgramState programState = new ProgramState();
+        programState.setReturnType(new ReturnType(null, null, DataType.NUMERICAL));
+        InterpreterVisitor interpreterVisitor = new InterpreterVisitor(programState);
+        Data data = interpreterVisitor.visit(tree);
+        assertEquals(data.getType(), DataType.NUMERICAL);
+        assertEquals(0, Double.compare(((Numerical) data).getValue(), 500.12));
     }
 
     @Test

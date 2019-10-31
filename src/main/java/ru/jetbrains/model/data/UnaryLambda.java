@@ -1,11 +1,11 @@
 package ru.jetbrains.model.data;
 
-import java.util.function.DoubleUnaryOperator;
+import java.util.function.DoubleFunction;
 
 public class UnaryLambda implements Data {
-    private final DoubleUnaryOperator operator;
+    private final DoubleFunction<?> operator;
 
-    public UnaryLambda(DoubleUnaryOperator operator) {
+    public UnaryLambda(DoubleFunction<?> operator) {
         this.operator = operator;
     }
 
@@ -14,7 +14,7 @@ public class UnaryLambda implements Data {
         return DataType.UNARY_LAMBDA;
     }
 
-    public DoubleUnaryOperator getOperator() {
+    public DoubleFunction<?> getOperator() {
         return operator;
     }
 }

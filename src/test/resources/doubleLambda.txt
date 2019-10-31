@@ -1,0 +1,1 @@
+out reduce( {1,2}, 1 , x y -> reduce({x,y} , x , m n -> m*n))
