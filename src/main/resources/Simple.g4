@@ -47,13 +47,13 @@ binaryLambda
     ;
 
 numerical
-    : (MINUS)? LPAREN numerical RPAREN          #signedNum
-    | <assoc=right> numerical POW numerical     #powNum
-    | numerical (TIMES | DIV) numerical         #mulNum
-    | numerical (PLUS | MINUS) numerical        #plusNum
-    | (MINUS)? constant                         #signedNum
-    | (MINUS)? reduce                           #signedNum
-    | (MINUS)? variable                         #signedNum
+    : (sing=MINUS)? LPAREN paren=numerical RPAREN                        #signedNum
+    | <assoc=right> left=numerical op=POW right=numerical        #opNum
+    | left=numerical op=(TIMES | DIV) right=numerical         #opNum
+    | left=numerical op=(PLUS | MINUS) right=numerical        #opNum
+    | (sing=MINUS)? cons=constant                                       #signedNum
+    | (sing=MINUS)? red=reduce                                         #signedNum
+    | (sing=MINUS)? vari=variable                                       #signedNum
     ;
 
 variable

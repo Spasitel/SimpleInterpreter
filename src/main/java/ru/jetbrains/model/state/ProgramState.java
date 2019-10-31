@@ -10,7 +10,7 @@ import java.util.Map;
  * Mutable current interpretation state
  */
 public class ProgramState {
-    private ReturnType returnType = new ReturnType(null, null, DataType.VOID);
+    private ReturnType returnType = new ReturnType(DataType.VOID, null, null);
     private ProgramResult result = new ProgramResult();
     private Map<String, Data> globalVariables = new LinkedHashMap<>();
 

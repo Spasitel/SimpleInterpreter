@@ -83,13 +83,6 @@ public interface SimpleVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitBinaryLambda(SimpleParser.BinaryLambdaContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code mulNum}
-	 * labeled alternative in {@link SimpleParser#numerical}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMulNum(SimpleParser.MulNumContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code signedNum}
 	 * labeled alternative in {@link SimpleParser#numerical}.
 	 * @param ctx the parse tree
@@ -97,19 +90,12 @@ public interface SimpleVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSignedNum(SimpleParser.SignedNumContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code plusNum}
+	 * Visit a parse tree produced by the {@code opNum}
 	 * labeled alternative in {@link SimpleParser#numerical}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitPlusNum(SimpleParser.PlusNumContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code powNum}
-	 * labeled alternative in {@link SimpleParser#numerical}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPowNum(SimpleParser.PowNumContext ctx);
+	T visitOpNum(SimpleParser.OpNumContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SimpleParser#variable}.
 	 * @param ctx the parse tree

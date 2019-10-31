@@ -9,7 +9,7 @@ public class ReturnType {
     private final String secondLambdaParameter;
     private final DataType type;
 
-    public ReturnType(String firstLambdaParameter, String secondLambdaParameter, DataType type) {
+    public ReturnType(DataType type, String firstLambdaParameter, String secondLambdaParameter) {
         this.firstLambdaParameter = firstLambdaParameter;
         this.secondLambdaParameter = secondLambdaParameter;
         this.type = type;

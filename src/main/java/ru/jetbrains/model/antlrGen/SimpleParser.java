@@ -707,28 +707,17 @@ public class SimpleParser extends Parser {
 			super.copyFrom(ctx);
 		}
 	}
-	public static class MulNumContext extends NumericalContext {
-		public List<NumericalContext> numerical() {
-			return getRuleContexts(NumericalContext.class);
-		}
-		public NumericalContext numerical(int i) {
-			return getRuleContext(NumericalContext.class,i);
-		}
-		public TerminalNode TIMES() { return getToken(SimpleParser.TIMES, 0); }
-		public TerminalNode DIV() { return getToken(SimpleParser.DIV, 0); }
-		public MulNumContext(NumericalContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof SimpleVisitor ) return ((SimpleVisitor<? extends T>)visitor).visitMulNum(this);
-			else return visitor.visitChildren(this);
-		}
-	}
 	public static class SignedNumContext extends NumericalContext {
+		public Token sing;
+		public NumericalContext paren;
+		public ConstantContext cons;
+		public ReduceContext red;
+		public VariableContext vari;
 		public TerminalNode LPAREN() { return getToken(SimpleParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(SimpleParser.RPAREN, 0); }
 		public NumericalContext numerical() {
 			return getRuleContext(NumericalContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(SimpleParser.RPAREN, 0); }
 		public TerminalNode MINUS() { return getToken(SimpleParser.MINUS, 0); }
 		public ConstantContext constant() {
 			return getRuleContext(ConstantContext.class,0);
@@ -746,23 +735,10 @@ public class SimpleParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class PlusNumContext extends NumericalContext {
-		public List<NumericalContext> numerical() {
-			return getRuleContexts(NumericalContext.class);
-		}
-		public NumericalContext numerical(int i) {
-			return getRuleContext(NumericalContext.class,i);
-		}
-		public TerminalNode PLUS() { return getToken(SimpleParser.PLUS, 0); }
-		public TerminalNode MINUS() { return getToken(SimpleParser.MINUS, 0); }
-		public PlusNumContext(NumericalContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof SimpleVisitor ) return ((SimpleVisitor<? extends T>)visitor).visitPlusNum(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class PowNumContext extends NumericalContext {
+	public static class OpNumContext extends NumericalContext {
+		public NumericalContext left;
+		public Token op;
+		public NumericalContext right;
 		public List<NumericalContext> numerical() {
 			return getRuleContexts(NumericalContext.class);
 		}
@@ -770,10 +746,14 @@ public class SimpleParser extends Parser {
 			return getRuleContext(NumericalContext.class,i);
 		}
 		public TerminalNode POW() { return getToken(SimpleParser.POW, 0); }
-		public PowNumContext(NumericalContext ctx) { copyFrom(ctx); }
+		public TerminalNode TIMES() { return getToken(SimpleParser.TIMES, 0); }
+		public TerminalNode DIV() { return getToken(SimpleParser.DIV, 0); }
+		public TerminalNode PLUS() { return getToken(SimpleParser.PLUS, 0); }
+		public TerminalNode MINUS() { return getToken(SimpleParser.MINUS, 0); }
+		public OpNumContext(NumericalContext ctx) { copyFrom(ctx); }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof SimpleVisitor ) return ((SimpleVisitor<? extends T>)visitor).visitPowNum(this);
+			if ( visitor instanceof SimpleVisitor ) return ((SimpleVisitor<? extends T>)visitor).visitOpNum(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -809,14 +789,14 @@ public class SimpleParser extends Parser {
 				if (_la==MINUS) {
 					{
 					setState(92);
-					match(MINUS);
+					((SignedNumContext)_localctx).sing = match(MINUS);
 					}
 				}
 
 				setState(95);
 				match(LPAREN);
 				setState(96);
-				numerical(0);
+				((SignedNumContext)_localctx).paren = numerical(0);
 				setState(97);
 				match(RPAREN);
 				}
@@ -832,12 +812,12 @@ public class SimpleParser extends Parser {
 				if (_la==MINUS) {
 					{
 					setState(99);
-					match(MINUS);
+					((SignedNumContext)_localctx).sing = match(MINUS);
 					}
 				}
 
 				setState(102);
-				constant();
+				((SignedNumContext)_localctx).cons = constant();
 				}
 				break;
 			case 3:
@@ -851,12 +831,12 @@ public class SimpleParser extends Parser {
 				if (_la==MINUS) {
 					{
 					setState(103);
-					match(MINUS);
+					((SignedNumContext)_localctx).sing = match(MINUS);
 					}
 				}
 
 				setState(106);
-				reduce();
+				((SignedNumContext)_localctx).red = reduce();
 				}
 				break;
 			case 4:
@@ -870,12 +850,12 @@ public class SimpleParser extends Parser {
 				if (_la==MINUS) {
 					{
 					setState(107);
-					match(MINUS);
+					((SignedNumContext)_localctx).sing = match(MINUS);
 					}
 				}
 
 				setState(110);
-				variable();
+				((SignedNumContext)_localctx).vari = variable();
 				}
 				break;
 			}
@@ -893,26 +873,29 @@ public class SimpleParser extends Parser {
 					switch ( getInterpreter().adaptivePredict(_input,9,_ctx) ) {
 					case 1:
 						{
-						_localctx = new PowNumContext(new NumericalContext(_parentctx, _parentState));
+						_localctx = new OpNumContext(new NumericalContext(_parentctx, _parentState));
+						((OpNumContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_numerical);
 						setState(113);
 						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
 						setState(114);
-						match(POW);
+						((OpNumContext)_localctx).op = match(POW);
 						setState(115);
-						numerical(6);
+						((OpNumContext)_localctx).right = numerical(6);
 						}
 						break;
 					case 2:
 						{
-						_localctx = new MulNumContext(new NumericalContext(_parentctx, _parentState));
+						_localctx = new OpNumContext(new NumericalContext(_parentctx, _parentState));
+						((OpNumContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_numerical);
 						setState(116);
 						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
 						setState(117);
+						((OpNumContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !(_la==TIMES || _la==DIV) ) {
-						_errHandler.recoverInline(this);
+							((OpNumContext)_localctx).op = (Token)_errHandler.recoverInline(this);
 						}
 						else {
 							if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
@@ -920,19 +903,21 @@ public class SimpleParser extends Parser {
 							consume();
 						}
 						setState(118);
-						numerical(6);
+						((OpNumContext)_localctx).right = numerical(6);
 						}
 						break;
 					case 3:
 						{
-						_localctx = new PlusNumContext(new NumericalContext(_parentctx, _parentState));
+						_localctx = new OpNumContext(new NumericalContext(_parentctx, _parentState));
+						((OpNumContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_numerical);
 						setState(119);
 						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
 						setState(120);
+						((OpNumContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !(_la==PLUS || _la==MINUS) ) {
-						_errHandler.recoverInline(this);
+							((OpNumContext)_localctx).op = (Token)_errHandler.recoverInline(this);
 						}
 						else {
 							if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
@@ -940,7 +925,7 @@ public class SimpleParser extends Parser {
 							consume();
 						}
 						setState(121);
-						numerical(5);
+						((OpNumContext)_localctx).right = numerical(5);
 						}
 						break;
 					}

@@ -16,25 +16,41 @@ import ru.jetbrains.model.state.ReturnType;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.assertEquals;
 
 public class InterpreterVisitorTest {
     @Test
     public void constantTest() {
-        CharStream input = CharStreams.fromString("500.12");
-        SimpleLexer lex = new SimpleLexer(input); // transforms characters into tokens
-        CommonTokenStream tokens = new CommonTokenStream(lex); // a token stream
-        SimpleParser parser = new SimpleParser(tokens); // transforms tokens into parse trees
-        ParseTree tree =  parser.constant();
+        SimpleParser parser = getSimpleParser(CharStreams.fromString("500.12"));
+        ParseTree tree = parser.constant();
 
         ProgramState programState = new ProgramState();
-        programState.setReturnType(new ReturnType(null, null, DataType.NUMERICAL));
+        programState.setReturnType(new ReturnType(DataType.NUMERICAL, null, null));
         InterpreterVisitor interpreterVisitor = new InterpreterVisitor(programState);
         Data data = interpreterVisitor.visit(tree);
         assertEquals(data.getType(), DataType.NUMERICAL);
         assertEquals(0, Double.compare(((Numerical) data).getValue(), 500.12));
+    }
+
+    @Test
+    public void numericalSignTest() {
+        SimpleParser parser = getSimpleParser(CharStreams.fromString("-500.12 + -5 + (2 + 3)"));
+        ParseTree tree = parser.numerical();
+
+        ProgramState programState = new ProgramState();
+        programState.setReturnType(new ReturnType(DataType.NUMERICAL, null, null));
+        InterpreterVisitor interpreterVisitor = new InterpreterVisitor(programState);
+        Data data = interpreterVisitor.visit(tree);
+        assertEquals(data.getType(), DataType.NUMERICAL);
+        assertEquals(0, Double.compare(((Numerical) data).getValue(), -500.12));
+    }
+
+
+    private SimpleParser getSimpleParser(CharStream codePointCharStream) {
+        CharStream input = codePointCharStream;
+        SimpleLexer lex = new SimpleLexer(input); // transforms characters into tokens
+        CommonTokenStream tokens = new CommonTokenStream(lex); // a token stream
+        return new SimpleParser(tokens);
     }
 
     @Test
@@ -43,10 +59,7 @@ public class InterpreterVisitorTest {
         String fileName = "grammarTest.txt";
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         InputStream is = classloader.getResourceAsStream(fileName);
-        CharStream input = CharStreams.fromStream(is);
-        SimpleLexer lex = new SimpleLexer(input); // transforms characters into tokens
-        CommonTokenStream tokens = new CommonTokenStream(lex); // a token stream
-        SimpleParser parser = new SimpleParser(tokens); // transforms tokens into parse trees
+        SimpleParser parser = getSimpleParser(CharStreams.fromStream(is));
         ParseTree t = parser.program();
         System.out.println(t.getText());
     }
