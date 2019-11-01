@@ -1,91 +1,76 @@
 grammar Simple;
 
 program
-    : stmt+ EOF ;
+    : stmt+ EOF
+    ;
 
 stmt
     : var
     | out
-    | print;
+    | print
+    ;
 
 var
-    : 'var' VARIABLE_NAME EQ expr ;
+    : 'var' def=VARIABLE_NAME EQ toCopy=VARIABLE_NAME   #varToVar
+    | 'var' def=VARIABLE_NAME EQ numerical              #numToVar
+    | 'var' def=VARIABLE_NAME EQ sequence               #seqToVar
+    ;
 
 out
-    : 'out' numerical ;
+    : 'out' numerical
+    ;
 
 print
-    : 'print' STRING;
+    : 'print' STRING
+    ;
 
 STRING
-    : '"'  ~["]* '"';
-
-expr
-    : numerical
-    | sequence;
+    : '"'  ~["]* '"'
+    ;
 
 sequence
-    : sequence_def
+    : sequenceDef
     | map
-    | variable;
+    | variable
+    ;
 
-sequence_def
-    : '{' numerical COMMA numerical '}' ;
+sequenceDef
+    : '{' start=numerical ',' finish=numerical '}'
+    ;
 
 map
-    : 'map('sequence COMMA unaryLambda ')' ;
-
-unaryLambda
-    : VARIABLE_NAME '->' numerical
+    : 'map('sequence ',' VARIABLE_NAME '->' numerical ')'
     ;
 
 reduce
-    : 'reduce('sequence COMMA numerical COMMA binaryLambda ')' ;
-
-binaryLambda
-    : VARIABLE_NAME VARIABLE_NAME '->' numerical
+    : 'reduce('sequence ',' init=numerical ',' first=VARIABLE_NAME second=VARIABLE_NAME '->' lambda=numerical ')'
     ;
 
 numerical
-    : (sing=MINUS)? LPAREN paren=numerical RPAREN                        #signedNum
-    | <assoc=right> left=numerical op=POW right=numerical        #opNum
-    | left=numerical op=(TIMES | DIV) right=numerical         #opNum
-    | left=numerical op=(PLUS | MINUS) right=numerical        #opNum
-    | (sing=MINUS)? cons=constant                                       #signedNum
-    | (sing=MINUS)? red=reduce                                         #signedNum
-    | (sing=MINUS)? vari=variable                                       #signedNum
+    : (sign=MINUS)? '(' parentheses=numerical ')'           #signedNum
+    | <assoc=right> left=numerical op=POW right=numerical   #opNum
+    | left=numerical op=(TIMES | DIV) right=numerical       #opNum
+    | left=numerical op=(PLUS | MINUS) right=numerical      #opNum
+    | (sign=MINUS)? reduceResult=reduce                     #signedNum
+    | (sign=MINUS)? numVar=variable                         #signedNum
+    | (sign=MINUS)? constant=CONST                          #signedNum
     ;
 
 variable
-    : VARIABLE_NAME;
-
-constant
-    : CONST
+    : VARIABLE_NAME
     ;
-
-LPAREN
-   : '('
-   ;
-
-
-RPAREN
-   : ')'
-   ;
 
 PLUS
    : '+'
    ;
 
-
 MINUS
    : '-'
    ;
 
-
 TIMES
    : '*'
    ;
-
 
 DIV
    : '/'
@@ -95,16 +80,9 @@ EQ
    : '='
    ;
 
-
-COMMA
-   : ','
-   ;
-
-
 POINT
    : '.'
    ;
-
 
 POW
    : '^'
@@ -117,7 +95,6 @@ CONST
 VARIABLE_NAME
    : VALID_ID_START VALID_ID_CHAR*
    ;
-
 
 fragment VALID_ID_START
    : ('a' .. 'z') | ('A' .. 'Z') | '_'

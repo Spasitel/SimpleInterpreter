@@ -23,11 +23,26 @@ public interface SimpleVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStmt(SimpleParser.StmtContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SimpleParser#var}.
+	 * Visit a parse tree produced by the {@code varToVar}
+	 * labeled alternative in {@link SimpleParser#var}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitVar(SimpleParser.VarContext ctx);
+	T visitVarToVar(SimpleParser.VarToVarContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code numToVar}
+	 * labeled alternative in {@link SimpleParser#var}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNumToVar(SimpleParser.NumToVarContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code seqToVar}
+	 * labeled alternative in {@link SimpleParser#var}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSeqToVar(SimpleParser.SeqToVarContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SimpleParser#out}.
 	 * @param ctx the parse tree
@@ -41,23 +56,17 @@ public interface SimpleVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPrint(SimpleParser.PrintContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SimpleParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExpr(SimpleParser.ExprContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link SimpleParser#sequence}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitSequence(SimpleParser.SequenceContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SimpleParser#sequence_def}.
+	 * Visit a parse tree produced by {@link SimpleParser#sequenceDef}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSequence_def(SimpleParser.Sequence_defContext ctx);
+	T visitSequenceDef(SimpleParser.SequenceDefContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SimpleParser#map}.
 	 * @param ctx the parse tree
@@ -65,23 +74,11 @@ public interface SimpleVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMap(SimpleParser.MapContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SimpleParser#unaryLambda}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitUnaryLambda(SimpleParser.UnaryLambdaContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link SimpleParser#reduce}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitReduce(SimpleParser.ReduceContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link SimpleParser#binaryLambda}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitBinaryLambda(SimpleParser.BinaryLambdaContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code signedNum}
 	 * labeled alternative in {@link SimpleParser#numerical}.
@@ -102,10 +99,4 @@ public interface SimpleVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitVariable(SimpleParser.VariableContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link SimpleParser#constant}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitConstant(SimpleParser.ConstantContext ctx);
 }

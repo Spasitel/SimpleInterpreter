@@ -1,17 +1,9 @@
 package ru.jetbrains.model;
 
 import ru.jetbrains.model.antlrGen.SimpleBaseVisitor;
-import ru.jetbrains.model.antlrGen.SimpleParser;
-import ru.jetbrains.model.data.BinaryLambda;
-import ru.jetbrains.model.data.Data;
-import ru.jetbrains.model.data.Numerical;
-import ru.jetbrains.model.data.UnaryLambda;
 import ru.jetbrains.model.state.ProgramState;
 
-import java.util.function.DoubleBinaryOperator;
-
-//TODO change to SimpleVisitor
-public class InterpreterVisitor extends SimpleBaseVisitor<Data> {
+public class InterpreterVisitor extends SimpleBaseVisitor<Double> {
 
     private ProgramState state;
 
@@ -19,7 +11,7 @@ public class InterpreterVisitor extends SimpleBaseVisitor<Data> {
         this.state = state;
     }
 
-    @Override
+    /*@Override
     public Data visitConstant(SimpleParser.ConstantContext ctx) {
         double value = Double.parseDouble(ctx.CONST().getSymbol().getText());
 
@@ -80,6 +72,7 @@ public class InterpreterVisitor extends SimpleBaseVisitor<Data> {
         return (Double) ((UnaryLambda) child).getOperator().apply(x);
     }
 
+
     @Override
     public Data visitOpNum(SimpleParser.OpNumContext ctx) {
         Data left = visit(ctx.left);
@@ -119,7 +112,7 @@ public class InterpreterVisitor extends SimpleBaseVisitor<Data> {
             default:
                 throw new IllegalStateException();
         }
-    }
+    }*/
 
     //TODO all operations
 }

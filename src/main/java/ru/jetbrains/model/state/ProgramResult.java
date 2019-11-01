@@ -1,7 +1,13 @@
 package ru.jetbrains.model.state;
 
+import ru.jetbrains.common.ErrorInfo;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class ProgramResult {
     private String output = "";
+    private List<ErrorInfo> errors = new ArrayList<>();
 
     public String getOutput() {
         return output;
@@ -11,5 +17,7 @@ public class ProgramResult {
         output += str;
     }
 
-    //todo: errors
+    public List<ErrorInfo> getErrors() {
+        return errors;
+    }
 }

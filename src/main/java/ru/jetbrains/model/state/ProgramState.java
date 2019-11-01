@@ -1,33 +1,31 @@
 package ru.jetbrains.model.state;
 
-import ru.jetbrains.model.data.Data;
-import ru.jetbrains.model.data.DataType;
-
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Mutable current interpretation state
  */
 public class ProgramState {
-    private ReturnType returnType = new ReturnType(DataType.VOID, null, null);
     private ProgramResult result = new ProgramResult();
-    private Map<String, Data> globalVariables = new LinkedHashMap<>();
+    private Map<String, Double> globalDoubleVariables = new LinkedHashMap<>();
+    private Map<String, Double> lambdaParameters = new LinkedHashMap<>();
+    private Map<String, List> globalSequenceVariables = new LinkedHashMap<>();
 
     public ProgramResult getResult() {
         return result;
     }
 
-    public Map<String, Data> getGlobalVariables() {
-        return globalVariables;
+    public Map<String, Double> getGlobalDoubleVariables() {
+        return globalDoubleVariables;
     }
 
-    public ReturnType getReturnType() {
-        return returnType;
+    public Map<String, Double> getLambdaParameters() {
+        return lambdaParameters;
     }
 
-    public void setReturnType(ReturnType returnType) {
-        this.returnType = returnType;
+    public Map<String, List> getGlobalSequenceVariables() {
+        return globalSequenceVariables;
     }
-
 }

@@ -13,17 +13,22 @@ public class Interpreter {
     public ProgramResult process(String prog) {
         CharStream input = CharStreams.fromString(prog);
         SimpleLexer lex = new SimpleLexer(input); // transforms characters into tokens
+        lex.removeErrorListeners();
         CommonTokenStream tokens = new CommonTokenStream(lex); // a token stream
         SimpleParser parser = new SimpleParser(tokens); // transforms tokens into parse trees
-        ErrorListener listener = new ErrorListener();
-        parser.addParseListener(listener);
-        SimpleParser.ProgramContext tree = null;
-        try {
-            tree = parser.program();
-        } catch (IllegalArgumentException e) {
-            //TODO
+        parser.removeErrorListeners();
+
+        ErrorListener errorListener = new ErrorListener();
+        parser.addErrorListener(errorListener);
+
+        SimpleParser.ProgramContext tree = parser.program();
+
+        if (!errorListener.getErrors().isEmpty()) {
+            ProgramResult programResult = new ProgramResult();
+            programResult.getErrors().addAll(errorListener.getErrors());
+            return programResult;
         }
-        //TODO check listener
+
         ProgramState programState = new ProgramState();
         InterpreterVisitor interpreterVisitor = new InterpreterVisitor(programState);
         interpreterVisitor.visit(tree);
