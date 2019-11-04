@@ -1,6 +1,6 @@
-package ru.jetbrains.model.state;
+package com.jetbrains.model.state;
 
-import ru.jetbrains.common.ErrorInfo;
+import com.jetbrains.common.ErrorInfo;
 
 import java.util.ArrayList;
 import java.util.List;

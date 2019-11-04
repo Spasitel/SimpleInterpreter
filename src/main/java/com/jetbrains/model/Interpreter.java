@@ -1,12 +1,12 @@
-package ru.jetbrains.model;
+package com.jetbrains.model;
 
+import com.jetbrains.model.antlrGen.SimpleParser;
+import com.jetbrains.model.state.ProgramResult;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import ru.jetbrains.model.antlrGen.SimpleLexer;
-import ru.jetbrains.model.antlrGen.SimpleParser;
-import ru.jetbrains.model.state.ProgramResult;
-import ru.jetbrains.model.state.ProgramState;
+import com.jetbrains.model.antlrGen.SimpleLexer;
+import com.jetbrains.model.state.ProgramState;
 
 public class Interpreter {
 
@@ -30,7 +30,7 @@ public class Interpreter {
         }
 
         ProgramState programState = new ProgramState();
-        InterpreterVisitor interpreterVisitor = new InterpreterVisitor(programState);
+        DoubleVisitor interpreterVisitor = new DoubleVisitor(programState);
         interpreterVisitor.visit(tree);
 
         return programState.getResult();

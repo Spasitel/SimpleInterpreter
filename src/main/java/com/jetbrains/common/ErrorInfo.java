@@ -1,4 +1,4 @@
-package ru.jetbrains.common;
+package com.jetbrains.common;
 
 import java.util.Optional;
 

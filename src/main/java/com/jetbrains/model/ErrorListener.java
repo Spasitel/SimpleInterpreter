@@ -1,11 +1,11 @@
-package ru.jetbrains.model;
+package com.jetbrains.model;
 
+import com.jetbrains.common.ErrorInfo;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.jetbrains.common.ErrorInfo;
 
 import java.util.ArrayList;
 import java.util.BitSet;

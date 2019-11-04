@@ -1,19 +1,20 @@
-package ru.jetbrains.model;
+package com.jetbrains.model;
 
+import com.jetbrains.model.antlrGen.SimpleParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Test;
-import ru.jetbrains.model.antlrGen.SimpleLexer;
-import ru.jetbrains.model.antlrGen.SimpleParser;
+import com.jetbrains.model.antlrGen.SimpleLexer;
+import com.jetbrains.model.state.ProgramState;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
 
-public class InterpreterVisitorTest {
+public class InterpreterTest {
   /*  @Test
     public void constantTest() {
         SimpleParser parser = getSimpleParser(CharStreams.fromString("500.12"));
@@ -56,6 +57,8 @@ public class InterpreterVisitorTest {
         InputStream is = classloader.getResourceAsStream(fileName);
         SimpleParser parser = getSimpleParser(CharStreams.fromStream(is));
         ParseTree t = parser.program();
-        System.out.println(t.getText());
+        ProgramState state = new ProgramState();
+        t.accept(new VoidVisitor(state));
+        System.out.println(state.getResult().getOutput());
     }
 }

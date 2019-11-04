@@ -1,4 +1,4 @@
-package ru.jetbrains.model.state;
+package com.jetbrains.model.state;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,7 +11,7 @@ public class ProgramState {
     private ProgramResult result = new ProgramResult();
     private Map<String, Double> globalDoubleVariables = new LinkedHashMap<>();
     private Map<String, Double> lambdaParameters = new LinkedHashMap<>();
-    private Map<String, List> globalSequenceVariables = new LinkedHashMap<>();
+    private Map<String, List<Double>> globalSequenceVariables = new LinkedHashMap<>();
 
     public ProgramResult getResult() {
         return result;
@@ -25,7 +25,7 @@ public class ProgramState {
         return lambdaParameters;
     }
 
-    public Map<String, List> getGlobalSequenceVariables() {
+    public Map<String, List<Double>> getGlobalSequenceVariables() {
         return globalSequenceVariables;
     }
 }
