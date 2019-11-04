@@ -23,6 +23,11 @@ public class InterpreterException extends RuntimeException {
         this.stopIndex = context.getStop().getStopIndex();
     }
 
+    @Override
+    public String getMessage() {
+        return msg + " at " + line + " : " + startIndex + "-" + stopIndex;
+    }
+
     public String getMsg() {
         return msg;
     }

@@ -64,4 +64,24 @@ public class SequenceVisitor extends SimpleBaseVisitor<List<Double>> {
         state.getLambdaParameters().remove(param.getText());
         return result;
     }
+
+    @Override
+    public List<Double> visitParentheses(SimpleParser.ParenthesesContext ctx) {
+        return visit(ctx.arg);
+    }
+
+    @Override
+    public List<Double> visitReduce(SimpleParser.ReduceContext ctx) {
+        throw new InterpreterException("Type mismatch: expected sequence but was number", ctx);
+    }
+
+    @Override
+    public List<Double> visitConstant(SimpleParser.ConstantContext ctx) {
+        throw new InterpreterException("Type mismatch: expected sequence but was number", ctx);
+    }
+
+    @Override
+    public List<Double> visitOpExpression(SimpleParser.OpExpressionContext ctx) {
+        throw new InterpreterException("Type mismatch: expected sequence but was number", ctx);
+    }
 }

@@ -26,25 +26,20 @@ public class InterpreterTest {
         Data data = interpreterVisitor.visit(tree);
         assertEquals(data.getType(), DataType.NUMERICAL);
         assertEquals(0, Double.compare(((Numerical) data).getValue(), 500.12));
-    }
+    }*/
 
     @Test
     public void numericalSignTest() {
-        SimpleParser parser = getSimpleParser(CharStreams.fromString("-500.12 + -5 + (2 + 3)"));
-        ParseTree tree = parser.numerical();
-
-        ProgramState programState = new ProgramState();
-        programState.setReturnType(new ReturnType(DataType.NUMERICAL, null, null));
-        InterpreterVisitor interpreterVisitor = new InterpreterVisitor(programState);
-        Data data = interpreterVisitor.visit(tree);
-        assertEquals(data.getType(), DataType.NUMERICAL);
-        assertEquals(0, Double.compare(((Numerical) data).getValue(), -500.12));
-    }*/
+        SimpleParser parser = getSimpleParser(CharStreams.fromString("out reduce( ({1,2}), 1 , x y -> reduce({1,x} , 4 , m n -> x+n))"));
+        ParseTree t = parser.program();
+        ProgramState state = new ProgramState();
+        t.accept(new VoidVisitor(state));
+        System.out.println(state.getResult().getOutput());
+    }
 
 
     private SimpleParser getSimpleParser(CharStream codePointCharStream) {
-        CharStream input = codePointCharStream;
-        SimpleLexer lex = new SimpleLexer(input); // transforms characters into tokens
+        SimpleLexer lex = new SimpleLexer(codePointCharStream); // transforms characters into tokens
         CommonTokenStream tokens = new CommonTokenStream(lex); // a token stream
         return new SimpleParser(tokens);
     }

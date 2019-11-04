@@ -11,7 +11,7 @@ public class DoubleVisitor extends SimpleBaseVisitor<Double> {
 
     private ProgramState state;
 
-    public DoubleVisitor(ProgramState state) {
+    DoubleVisitor(ProgramState state) {
         this.state = state;
     }
 
@@ -102,4 +102,13 @@ public class DoubleVisitor extends SimpleBaseVisitor<Double> {
             throw new InterpreterException("Access to global variable from lambda", identifier.getSymbol());
     }
 
+    @Override
+    public Double visitSequenceDef(SimpleParser.SequenceDefContext ctx) {
+        throw new InterpreterException("Type mismatch: expected number but was sequence", ctx);
+    }
+
+    @Override
+    public Double visitMap(SimpleParser.MapContext ctx) {
+        throw new InterpreterException("Type mismatch: expected number but was sequence", ctx);
+    }
 }
