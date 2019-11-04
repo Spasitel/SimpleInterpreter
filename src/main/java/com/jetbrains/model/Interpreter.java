@@ -1,8 +1,10 @@
 package com.jetbrains.model;
 
 import com.jetbrains.common.ErrorInfo;
-import com.jetbrains.model.antlrGen.SimpleLexer;
-import com.jetbrains.model.antlrGen.SimpleParser;
+import com.jetbrains.model.antlrgen.SimpleLexer;
+import com.jetbrains.model.antlrgen.SimpleParser;
+import com.jetbrains.model.asthandlers.ErrorListener;
+import com.jetbrains.model.asthandlers.VoidVisitor;
 import com.jetbrains.model.state.ProgramResult;
 import com.jetbrains.model.state.ProgramState;
 import org.antlr.v4.runtime.CharStream;
@@ -31,10 +33,10 @@ public class Interpreter {
         }
 
         ProgramState programState = new ProgramState();
-        VoidVisitor interpreterVisitor = new VoidVisitor(programState);
+        VoidVisitor visitor = VoidVisitor.createVisitors(programState);
         try {
-            interpreterVisitor.visit(tree);
-        } catch (InterpreterException e) {
+            visitor.visit(tree);
+        } catch (InterpretationException e) {
             ProgramResult programResult = new ProgramResult();
             programResult.getErrors().add(new ErrorInfo(e.getMsg(), e.getLine(), e.getStartIndex(), e.getStopIndex()));
             return programResult;
@@ -46,4 +48,6 @@ public class Interpreter {
 
         return programState.getResult();
     }
+
+
 }

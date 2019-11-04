@@ -1,5 +1,5 @@
 // Generated from C:/workspace/SimpleInterpreter/src/main/resources\Simple.g4 by ANTLR 4.7.2
-package com.jetbrains.model.antlrGen;
+package com.jetbrains.model.antlrgen;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**

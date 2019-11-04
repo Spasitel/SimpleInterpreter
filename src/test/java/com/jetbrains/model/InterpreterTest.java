@@ -1,59 +1,128 @@
 package com.jetbrains.model;
 
-import com.jetbrains.model.antlrGen.SimpleParser;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
+import com.jetbrains.model.state.ProgramResult;
 import org.junit.Test;
-import com.jetbrains.model.antlrGen.SimpleLexer;
-import com.jetbrains.model.state.ProgramState;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class InterpreterTest {
-  /*  @Test
-    public void constantTest() {
-        SimpleParser parser = getSimpleParser(CharStreams.fromString("500.12"));
-        ParseTree tree = parser.constant();
-
-        ProgramState programState = new ProgramState();
-        programState.setReturnType(new ReturnType(DataType.NUMERICAL, null, null));
-        InterpreterVisitor interpreterVisitor = new InterpreterVisitor(programState);
-        Data data = interpreterVisitor.visit(tree);
-        assertEquals(data.getType(), DataType.NUMERICAL);
-        assertEquals(0, Double.compare(((Numerical) data).getValue(), 500.12));
-    }*/
 
     @Test
-    public void numericalSignTest() {
-        SimpleParser parser = getSimpleParser(CharStreams.fromString("out reduce( ({1,2}), 1 , x y -> reduce({1,x} , 4 , m n -> x+n))"));
-        ParseTree t = parser.program();
-        ProgramState state = new ProgramState();
-        t.accept(new VoidVisitor(state));
-        System.out.println(state.getResult().getOutput());
-    }
-
-
-    private SimpleParser getSimpleParser(CharStream codePointCharStream) {
-        SimpleLexer lex = new SimpleLexer(codePointCharStream); // transforms characters into tokens
-        CommonTokenStream tokens = new CommonTokenStream(lex); // a token stream
-        return new SimpleParser(tokens);
+    public void syntaxErrorFail() {
+        ProgramResult result = new Interpreter().process(
+                "unknown command");
+        assertFalse(result.getErrors().isEmpty());
     }
 
     @Test
-    public void exampleTest() throws IOException {
-        //TODO: fix or remove
-        String fileName = "grammarTest.txt";
-        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        InputStream is = classloader.getResourceAsStream(fileName);
-        SimpleParser parser = getSimpleParser(CharStreams.fromStream(is));
-        ParseTree t = parser.program();
-        ProgramState state = new ProgramState();
-        t.accept(new VoidVisitor(state));
-        System.out.println(state.getResult().getOutput());
+    public void globalVarDoubleSuccess() {
+        ProgramResult result = new Interpreter().process(
+                "var x = 5.0 " +
+                        "out x");
+        assertTrue(result.getErrors().isEmpty());
+        assertEquals(result.getOutput(), "5.0");
     }
+
+    @Test
+    public void globalVarSequenceSuccess() {
+        ProgramResult result = new Interpreter().process(
+                "var x = {1, 3} " +
+                        "out reduce(x , 0 , n m -> n + m)");
+        assertTrue(result.getErrors().isEmpty());
+        assertEquals(result.getOutput(), "6.0");
+    }
+
+    @Test
+    public void globalVarCopySuccess() {
+        ProgramResult result = new Interpreter().process(
+                "var x = {1, 3} " +
+                        "var y = x " +
+                        "out reduce(y , 0 , n m -> n + m)");
+        assertTrue(result.getErrors().isEmpty());
+        assertEquals(result.getOutput(), "6.0");
+    }
+
+    @Test
+    public void globalVarSequenceAsDoubleFail() {
+        ProgramResult result = new Interpreter().process(
+                "var x = {1, 3} " +
+                        "out reduce({0, 4} , x , n m -> n + m)");
+        assertFalse(result.getErrors().isEmpty());
+    }
+
+    @Test
+    public void globalVarDoubleAsSequenceFail() {
+        ProgramResult result = new Interpreter().process(
+                "var x = 6 " +
+                        "out reduce(x , 3 , n m -> n + m)");
+        assertFalse(result.getErrors().isEmpty());
+    }
+
+    @Test
+    public void globalVarUseBeforeDefFail() {
+        ProgramResult result = new Interpreter().process(
+                "out reduce({1 , 10} , x , n m -> n + m) " +
+                        "var x = 6 ");
+        assertFalse(result.getErrors().isEmpty());
+    }
+
+    @Test
+    public void globalVarDoubleDefFail() {
+        ProgramResult result = new Interpreter().process(
+                "var x = {1, 34} " +
+                        "var x = 6 ");
+        assertFalse(result.getErrors().isEmpty());
+    }
+
+    @Test
+    public void globalVarUseInLambdaFail() {
+        ProgramResult result = new Interpreter().process(
+                "var x = 6 " +
+                        "out reduce({1,5} , 3 , n m -> x + m)");
+        assertFalse(result.getErrors().isEmpty());
+    }
+
+    @Test
+    public void globalVarUseAsLambdaParamFail() {
+        ProgramResult result = new Interpreter().process(
+                "var x = 6 " +
+                        "out reduce({1,5} , 3 , x m -> m + 1)");
+        assertFalse(result.getErrors().isEmpty());
+    }
+
+
+    @Test
+    public void exampleTestSuccess() throws IOException {
+        String test = getResourceFileAsString("grammarTest.txt");
+        Interpreter interpreter = new Interpreter();
+        ProgramResult result = interpreter.process(test);
+        assertTrue(result.getErrors().isEmpty());
+        assertTrue(result.getOutput().startsWith("pi = 3.14"));
+    }
+
+    /**
+     * Reads given resource file as a string.
+     *
+     * @param fileName path to the resource file
+     * @return the file's contents
+     * @throws IOException if read fails for any reason
+     */
+    private String getResourceFileAsString(String fileName) throws IOException {
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        try (InputStream is = classLoader.getResourceAsStream(fileName)) {
+            if (is == null)
+                return null;
+            try (InputStreamReader isr = new InputStreamReader(is);
+                 BufferedReader reader = new BufferedReader(isr)) {
+                return reader.lines().collect(Collectors.joining(System.lineSeparator()));
+            }
+        }
+    }
+
 }

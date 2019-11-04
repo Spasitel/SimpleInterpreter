@@ -1,18 +1,32 @@
-package com.jetbrains.model;
+package com.jetbrains.model.asthandlers;
 
-import com.jetbrains.model.antlrGen.SimpleBaseVisitor;
-import com.jetbrains.model.antlrGen.SimpleParser;
+import com.jetbrains.model.InterpretationException;
+import com.jetbrains.model.antlrgen.SimpleBaseVisitor;
+import com.jetbrains.model.antlrgen.SimpleParser;
 import com.jetbrains.model.state.ProgramState;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class DoubleVisitor extends SimpleBaseVisitor<Double> {
+    private final Logger logger = LoggerFactory.getLogger(DoubleVisitor.class);
 
     private ProgramState state;
+    private VoidVisitor voidVisitor;
+    private SequenceVisitor sequenceVisitor;
 
     DoubleVisitor(ProgramState state) {
         this.state = state;
+    }
+
+    void setVoidVisitor(VoidVisitor voidVisitor) {
+        this.voidVisitor = voidVisitor;
+    }
+
+    void setSequenceVisitor(SequenceVisitor sequenceVisitor) {
+        this.sequenceVisitor = sequenceVisitor;
     }
 
     @Override
@@ -20,20 +34,29 @@ public class DoubleVisitor extends SimpleBaseVisitor<Double> {
         double left = visit(ctx.left);
         double right = visit(ctx.right);
 
+        double result;
         switch (ctx.op.getText().charAt(0)) {
             case '^':
-                return Math.pow(left, right);
+                result = Math.pow(left, right);
+                break;
             case '*':
-                return left * right;
+                result = left * right;
+                break;
             case '/':
-                return left / right;
+                result = left / right;
+                break;
             case '+':
-                return left + right;
+                result = left + right;
+                break;
             case '-':
-                return left - right;
+                result = left - right;
+                break;
             default:
-                throw new InterpreterException("Unknown operation", ctx.op);
+                throw new InterpretationException("Unknown operation", ctx.op);
         }
+
+        logger.trace("{} := {}", ctx.getText(), result);
+        return result;
     }
 
     @Override
@@ -44,9 +67,10 @@ public class DoubleVisitor extends SimpleBaseVisitor<Double> {
     @Override
     public Double visitConstant(SimpleParser.ConstantContext ctx) {
         try {
-            return Double.parseDouble(ctx.NUMBER().getText());
+            double sign = ctx.sign == null ? 1 : -1;
+            return sign * Double.parseDouble(ctx.NUMBER().getText());
         } catch (NumberFormatException e) {
-            throw new InterpreterException("Constant parse error", ctx.NUMBER().getSymbol());
+            throw new InterpretationException("Constant parse error", ctx.NUMBER().getSymbol());
         }
     }
 
@@ -57,13 +81,17 @@ public class DoubleVisitor extends SimpleBaseVisitor<Double> {
 
         String name = identifier.getText();
         if (state.getGlobalSequenceVariables().containsKey(name))
-            throw new InterpreterException("Type mismatch: expected number but was sequence",
+            throw new InterpretationException("Type mismatch: expected number but was sequence",
                     identifier.getSymbol());
 
-        if (state.getGlobalDoubleVariables().containsKey(name))
-            return state.getGlobalDoubleVariables().get(name);
-        else
-            return state.getLambdaParameters().get(name);
+        double result;
+        if (state.getGlobalDoubleVariables().containsKey(name)) {
+            result = state.getGlobalDoubleVariables().get(name);
+        } else {
+            result = state.getLambdaParameters().get(name);
+        }
+        logger.trace("{} := {}", ctx.getText(), result);
+        return result;
     }
 
     @Override
@@ -71,13 +99,12 @@ public class DoubleVisitor extends SimpleBaseVisitor<Double> {
         String firstParamName = ctx.firstParam.getText();
         String secondParamName = ctx.secondParam.getText();
         if (firstParamName.equals(secondParamName))
-            throw new InterpreterException("Lambda parameters should be different", ctx.secondParam);
+            throw new InterpretationException("Lambda parameters should be different", ctx.secondParam);
 
-        VoidVisitor voidVisitor = new VoidVisitor(state);
         voidVisitor.commonNewVariableCheck(ctx.firstParam);
         voidVisitor.commonNewVariableCheck(ctx.secondParam);
 
-        List<Double> arg = new SequenceVisitor(state).visit(ctx.arg);
+        List<Double> arg = sequenceVisitor.visit(ctx.arg);
         double result = visit(ctx.start);
         state.getLambdaParameters().put(firstParamName, result);
         for (double secondParam : arg) {
@@ -88,6 +115,7 @@ public class DoubleVisitor extends SimpleBaseVisitor<Double> {
         state.getLambdaParameters().remove(firstParamName);
         state.getLambdaParameters().remove(secondParamName);
 
+        logger.trace("{} := {}", ctx.getText(), result);
         return result;
     }
 
@@ -96,19 +124,19 @@ public class DoubleVisitor extends SimpleBaseVisitor<Double> {
         boolean isGlobal = state.getGlobalDoubleVariables().containsKey(name) ||
                 state.getGlobalSequenceVariables().containsKey(name);
         if (!isGlobal && !state.getLambdaParameters().containsKey(name))
-            throw new InterpreterException("Variable " + name + " not found", identifier.getSymbol());
+            throw new InterpretationException("Variable " + name + " not found", identifier.getSymbol());
 
         if (!state.getLambdaParameters().isEmpty() && isGlobal)
-            throw new InterpreterException("Access to global variable from lambda", identifier.getSymbol());
+            throw new InterpretationException("Access to global variable from lambda", identifier.getSymbol());
     }
 
     @Override
     public Double visitSequenceDef(SimpleParser.SequenceDefContext ctx) {
-        throw new InterpreterException("Type mismatch: expected number but was sequence", ctx);
+        throw new InterpretationException("Type mismatch: expected number but was sequence", ctx);
     }
 
     @Override
     public Double visitMap(SimpleParser.MapContext ctx) {
-        throw new InterpreterException("Type mismatch: expected number but was sequence", ctx);
+        throw new InterpretationException("Type mismatch: expected number but was sequence", ctx);
     }
 }

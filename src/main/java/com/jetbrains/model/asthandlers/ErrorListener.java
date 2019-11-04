@@ -1,4 +1,4 @@
-package com.jetbrains.model;
+package com.jetbrains.model.asthandlers;
 
 import com.jetbrains.common.ErrorInfo;
 import org.antlr.v4.runtime.*;

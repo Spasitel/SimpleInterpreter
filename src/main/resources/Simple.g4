@@ -17,7 +17,7 @@ expr
     | '(' arg=expr ')'                                  #parentheses
     | IDENTIFIER                                        #variable
     | '{' start=expr ',' end=expr '}'                   #sequenceDef
-    | NUMBER                                            #constant
+    | (sign='-')?NUMBER                                 #constant
     | 'map(' arg=expr ',' param=IDENTIFIER '->' lambda=expr ')'                                             #map
     | 'reduce(' arg=expr ',' start=expr',' firstParam=IDENTIFIER secondParam=IDENTIFIER '->' lambda=expr')' #reduce
     ;
@@ -27,7 +27,7 @@ STRING
     ;
 
 NUMBER
-    : ('-')?('0' .. '9') + ('.' ('0' .. '9') +)?
+    : ('0' .. '9') + ('.' ('0' .. '9') +)?
     ;
 IDENTIFIER
     : VALID_ID_START VALID_ID_CHAR*

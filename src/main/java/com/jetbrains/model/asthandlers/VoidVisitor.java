@@ -1,7 +1,8 @@
-package com.jetbrains.model;
+package com.jetbrains.model.asthandlers;
 
-import com.jetbrains.model.antlrGen.SimpleBaseVisitor;
-import com.jetbrains.model.antlrGen.SimpleParser;
+import com.jetbrains.model.InterpretationException;
+import com.jetbrains.model.antlrgen.SimpleBaseVisitor;
+import com.jetbrains.model.antlrgen.SimpleParser;
 import com.jetbrains.model.state.ProgramState;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -11,9 +12,36 @@ import java.util.Map;
 
 public class VoidVisitor extends SimpleBaseVisitor<Void> {
     private ProgramState state;
+    private DoubleVisitor doubleVisitor;
+    private SequenceVisitor sequenceVisitor;
 
-    public VoidVisitor(ProgramState state) {
+    private VoidVisitor(ProgramState state) {
         this.state = state;
+    }
+
+    public static VoidVisitor createVisitors(ProgramState programState) {
+        VoidVisitor voidVisitor = new VoidVisitor(programState);
+        DoubleVisitor doubleVisitor = new DoubleVisitor(programState);
+        SequenceVisitor sequenceVisitor = new SequenceVisitor(programState);
+
+        voidVisitor.setDoubleVisitor(doubleVisitor);
+        voidVisitor.setSequenceVisitor(sequenceVisitor);
+
+        doubleVisitor.setVoidVisitor(voidVisitor);
+        doubleVisitor.setSequenceVisitor(sequenceVisitor);
+
+        sequenceVisitor.setVoidVisitor(voidVisitor);
+        sequenceVisitor.setDoubleVisitor(doubleVisitor);
+
+        return voidVisitor;
+    }
+
+    private void setDoubleVisitor(DoubleVisitor doubleVisitor) {
+        this.doubleVisitor = doubleVisitor;
+    }
+
+    private void setSequenceVisitor(SequenceVisitor sequenceVisitor) {
+        this.sequenceVisitor = sequenceVisitor;
     }
 
     @Override
@@ -27,7 +55,7 @@ public class VoidVisitor extends SimpleBaseVisitor<Void> {
 
     @Override
     public Void visitOutStmt(SimpleParser.OutStmtContext ctx) {
-        Double value = new DoubleVisitor(state).visit(ctx.arg);
+        Double value = doubleVisitor.visit(ctx.arg);
         state.getResult().addToOutput(value.toString());
         return null;
     }
@@ -52,12 +80,12 @@ public class VoidVisitor extends SimpleBaseVisitor<Void> {
                 from instanceof SimpleParser.ParenthesesContext ||
                 from instanceof SimpleParser.ConstantContext ||
                 from instanceof SimpleParser.ReduceContext) {
-            double value = new DoubleVisitor(state).visit(from);
+            double value = doubleVisitor.visit(from);
             globalDoubleVariables.put(varName, value);
 
         } else if (from instanceof SimpleParser.SequenceDefContext ||
                 from instanceof SimpleParser.MapContext) {
-            List<Double> sequence = new SequenceVisitor(state).visit(from);
+            List<Double> sequence = sequenceVisitor.visit(from);
             globalSequenceVariables.put(varName, sequence);
 
         } else if (from instanceof SimpleParser.VariableContext) {
@@ -68,11 +96,11 @@ public class VoidVisitor extends SimpleBaseVisitor<Void> {
             } else if (globalSequenceVariables.containsKey(fromVarName)) {
                 globalSequenceVariables.put(varName, globalSequenceVariables.get(fromVarName));
             } else {
-                throw new InterpreterException("Variable " + fromVarName + " not found", fromVar);
+                throw new InterpretationException("Variable " + fromVarName + " not found", fromVar);
             }
 
         } else {
-            throw new InterpreterException("Unknown operation", from);
+            throw new InterpretationException("Unknown operation", from);
         }
         return null;
     }
@@ -82,7 +110,7 @@ public class VoidVisitor extends SimpleBaseVisitor<Void> {
         if (state.getGlobalDoubleVariables().containsKey(varName) ||
                 state.getGlobalSequenceVariables().containsKey(varName) ||
                 state.getLambdaParameters().containsKey(varName)) {
-            throw new InterpreterException("Variable " + varName + " already exist", node);
+            throw new InterpretationException("Variable " + varName + " already exist", node);
         }
     }
 }
