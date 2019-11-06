@@ -7,34 +7,20 @@ import java.util.Optional;
  */
 public class ErrorInfo {
     private final String msg;
-    private final Integer line;
-    private final int startIndex;
-    private final int stopIndex;
+    private final Position position;
 
-    public ErrorInfo(String msg, int line, int startIndex, int stopIndex) {
+    public ErrorInfo(String msg, Position position) {
         this.msg = msg;
-        this.line = line;
-        this.startIndex = startIndex;
-        this.stopIndex = Math.max(stopIndex, startIndex);
+        this.position = position;
     }
 
     public ErrorInfo(String msg) {
         this.msg = msg;
-        this.line = null;
-        this.startIndex = 0;
-        this.stopIndex = 0;
+        this.position = null;
     }
 
-    public Optional<Integer> getLine() {
-        return Optional.ofNullable(line);
-    }
-
-    public int getStopIndex() {
-        return stopIndex;
-    }
-
-    public int getStartIndex() {
-        return startIndex;
+    public Optional<Position> getPosition() {
+        return Optional.ofNullable(position);
     }
 
     public String getMsg() {

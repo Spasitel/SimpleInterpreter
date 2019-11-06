@@ -1,6 +1,7 @@
 package com.jetbrains.model.asthandlers;
 
 import com.jetbrains.common.ErrorInfo;
+import com.jetbrains.common.Position;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -24,12 +25,14 @@ public class ErrorListener implements ANTLRErrorListener {
                             String msg, RecognitionException e) {
         logger.error("Syntax error in {},{} : {}", line, charPositionInLine, msg);
 
-        int stopIndex = 0;
+        Position position;
         if (offendingSymbol instanceof Token) {
-            stopIndex = ((Token) offendingSymbol).getStopIndex();
+            position = new Position((Token) offendingSymbol);
+        } else {
+            position = new Position(line, charPositionInLine);
         }
 
-        errors.add(new ErrorInfo(msg, line, charPositionInLine, stopIndex));
+        errors.add(new ErrorInfo(msg, position));
     }
 
     @Override

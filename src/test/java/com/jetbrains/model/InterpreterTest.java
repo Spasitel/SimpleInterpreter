@@ -1,6 +1,6 @@
 package com.jetbrains.model;
 
-import com.jetbrains.model.state.ProgramResult;
+import com.jetbrains.common.ProgramResult;
 import org.junit.Test;
 
 import java.io.BufferedReader;

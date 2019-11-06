@@ -1,46 +1,33 @@
 package com.jetbrains.model;
 
+import com.jetbrains.common.Position;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
 public class InterpretationException extends RuntimeException {
     private final String msg;
-    private final Integer line;
-    private final int startIndex;
-    private final int stopIndex;
+    private final Position position;
 
     public InterpretationException(String msg, Token symbol) {
         this.msg = msg;
-        this.line = symbol.getLine();
-        this.startIndex = symbol.getStartIndex();
-        this.stopIndex = symbol.getStopIndex();
+        this.position = new Position(symbol);
     }
 
     public InterpretationException(String msg, ParserRuleContext context) {
         this.msg = msg;
-        this.line = context.getStart().getLine();
-        this.startIndex = context.getStart().getStartIndex();
-        this.stopIndex = context.getStop().getStopIndex();
+        this.position = new Position(context);
     }
 
     @Override
     public String getMessage() {
-        return msg + " at " + line + " : " + startIndex + "-" + stopIndex;
+        return msg;
     }
 
     String getMsg() {
         return msg;
     }
 
-    Integer getLine() {
-        return line;
-    }
-
-    int getStartIndex() {
-        return startIndex;
-    }
-
-    int getStopIndex() {
-        return stopIndex;
+    Position getPosition() {
+        return position;
     }
 }

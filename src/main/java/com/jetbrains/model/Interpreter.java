@@ -5,7 +5,7 @@ import com.jetbrains.model.antlrgen.SimpleLexer;
 import com.jetbrains.model.antlrgen.SimpleParser;
 import com.jetbrains.model.asthandlers.ErrorListener;
 import com.jetbrains.model.asthandlers.VoidVisitor;
-import com.jetbrains.model.state.ProgramResult;
+import com.jetbrains.common.ProgramResult;
 import com.jetbrains.model.state.ProgramState;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -13,8 +13,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 public class Interpreter {
 
-    public ProgramResult process(String prog) {
-        CharStream input = CharStreams.fromString(prog);
+    public ProgramResult process(String program) {
+        CharStream input = CharStreams.fromString(program);
         SimpleLexer lex = new SimpleLexer(input); // transforms characters into tokens
         lex.removeErrorListeners();
         CommonTokenStream tokens = new CommonTokenStream(lex); // a token stream
@@ -38,7 +38,7 @@ public class Interpreter {
             visitor.visit(tree);
         } catch (InterpretationException e) {
             ProgramResult programResult = new ProgramResult();
-            programResult.getErrors().add(new ErrorInfo(e.getMsg(), e.getLine(), e.getStartIndex(), e.getStopIndex()));
+            programResult.getErrors().add(new ErrorInfo(e.getMsg(), e.getPosition()));
             return programResult;
         } catch (Exception e) {
             ProgramResult programResult = new ProgramResult();
