@@ -44,11 +44,14 @@ public class Position {
         return length;
     }
 
-    public int getLine(String program){
-        if(line > -1)
-            return line;
+    public String getLineAndPosition(String program) {
+        if (line > -1)
+            return (line + 1) + ":" + positionInLine;
 
-        return (int) program.chars().limit(startIndex).filter(ch -> ch == '\n').count();
+        String sub = program.substring(0, startIndex);
+        int resultLine = (int) (sub.chars().filter(ch -> ch == '\n').count()) + 1;
+        int resultPosition = sub.length() - sub.lastIndexOf('\n');
+        return resultLine + ":" + resultPosition;
     }
 }
 

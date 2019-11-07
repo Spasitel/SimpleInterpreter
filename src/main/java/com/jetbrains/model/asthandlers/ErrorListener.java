@@ -29,7 +29,7 @@ public class ErrorListener implements ANTLRErrorListener {
         if (offendingSymbol instanceof Token) {
             position = new Position((Token) offendingSymbol);
         } else {
-            position = new Position(line, charPositionInLine);
+            position = new Position(line - 1, charPositionInLine);
         }
 
         errors.add(new ErrorInfo(msg, position));

@@ -49,6 +49,8 @@ public class VoidVisitor extends SimpleBaseVisitor<Void> {
         for (ParseTree tree : ctx.children) {
             if (tree instanceof SimpleParser.StmtContext)
                 visit(tree);
+            if (Thread.currentThread().isInterrupted())
+                throw new RuntimeException("Interrupted");
         }
         return null;
     }

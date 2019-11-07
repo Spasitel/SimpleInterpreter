@@ -81,6 +81,8 @@ public class SequenceVisitor extends SimpleBaseVisitor<List<Double>> {
         for (double element : argument) {
             state.getLambdaParameters().put(param.getText(), element);
             result.add(doubleVisitor.visit(ctx.lambda));
+            if (Thread.currentThread().isInterrupted())
+                throw new RuntimeException("Interrupted");
         }
         state.getLambdaParameters().remove(param.getText());
         logger.trace("{} := sequence size:{} first:{} last:{}", ctx.getText(), result.size(), result.get(0),

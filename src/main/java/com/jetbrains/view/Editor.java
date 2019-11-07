@@ -8,10 +8,9 @@ import com.jetbrains.controller.Controller;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
+import javax.swing.text.*;
 import java.awt.*;
+import java.util.List;
 
 public class Editor extends JFrame {
     private static final SimpleAttributeSet BLACK_FONT = new SimpleAttributeSet();
@@ -76,21 +75,24 @@ public class Editor extends JFrame {
         setVisible(true);
     }
 
-
     private void onInputChange() {
         SwingUtilities.invokeLater(() -> {
             StyledDocument document = (StyledDocument) inputPane.getDocument();
             document.removeDocumentListener(listener);
-            document.setCharacterAttributes(0, document.getLength() + 1, BLACK_FONT, false);
+            document.setCharacterAttributes(0, document.getLength() + 1, BLACK_FONT, true);
             document.addDocumentListener(listener);
             resultArea.setForeground(Color.GRAY);
         });
-
-        controller.onInputChange();
+        SwingUtilities.invokeLater(() -> controller.onInputChange(getInputText()));
     }
 
-    public String getInputText() {
-        return inputPane.getText();
+    private String getInputText() {
+        Document document = inputPane.getDocument();
+        try {
+            return document.getText(0, document.getLength());
+        } catch (BadLocationException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public void applyInterpreterResults(ProgramResult result) {
@@ -100,35 +102,41 @@ public class Editor extends JFrame {
                 resultArea.setText(result.getOutput());
             });
         } else {
-            SwingUtilities.invokeLater(() -> {
-                resultArea.setForeground(Color.RED);
-                boolean isFirst = true;
-                for (ErrorInfo errorInfo : result.getErrors()) {
-                    if (isFirst) {
-                        resultArea.setText("");
-                        isFirst = false;
-                    } else {
-                        resultArea.append("\n");
-                    }
-
-                    if (errorInfo.getPosition().isPresent()) {
-                        Position position = errorInfo.getPosition().get();
-                        String text = inputPane.getText();
-                        int startIndex = position.getStartIndex(text);
-                        resultArea.append("line " + position.getLine(text) + ":" +
-                                startIndex + " " + errorInfo.getMsg());
-
-                        StyledDocument document = (StyledDocument) inputPane.getDocument();
-                        document.removeDocumentListener(listener);
-                        document.setCharacterAttributes(startIndex, position.getLength(), RED_FONT, false);
-                        document.addDocumentListener(listener);
-                    } else {
-                        resultArea.append(errorInfo.getMsg());
-                    }
-                }
-            });
+            SwingUtilities.invokeLater(() -> renderErrors(result.getErrors()));
         }
     }
 
+    private void renderErrors(List<ErrorInfo> errors) {
+        resultArea.setForeground(Color.RED);
+        boolean isFirst = true;
+        for (ErrorInfo errorInfo : errors) {
+            if (isFirst) {
+                resultArea.setText("");
+                isFirst = false;
+            } else {
+                resultArea.append("\n");
+            }
 
+            if (errorInfo.getPosition().isPresent()) {
+                renderErrorWithPosition(errorInfo.getMsg(), errorInfo.getPosition().get());
+            } else {
+                resultArea.append(errorInfo.getMsg());
+            }
+        }
+    }
+
+    private void renderErrorWithPosition(String errorMessage, Position position) {
+        String text = getInputText();
+        int startIndex = position.getStartIndex(text);
+        if (startIndex >= text.length()) {
+            resultArea.append("At EOF: " + errorMessage);
+        } else {
+            resultArea.append("At line " + position.getLineAndPosition(text) + " " + errorMessage);
+
+            StyledDocument document = (StyledDocument) inputPane.getDocument();
+            document.removeDocumentListener(listener);
+            document.setCharacterAttributes(startIndex, position.getLength(), RED_FONT, true);
+            document.addDocumentListener(listener);
+        }
+    }
 }

@@ -31,6 +31,9 @@ public class DoubleVisitor extends SimpleBaseVisitor<Double> {
 
     @Override
     public Double visitOpExpression(SimpleParser.OpExpressionContext ctx) {
+        if (Thread.currentThread().isInterrupted())
+            throw new RuntimeException("Interrupted");
+
         double left = visit(ctx.left);
         double right = visit(ctx.right);
 
@@ -111,6 +114,9 @@ public class DoubleVisitor extends SimpleBaseVisitor<Double> {
             state.getLambdaParameters().put(secondParamName, secondParam);
             result = visit(ctx.lambda);
             state.getLambdaParameters().put(firstParamName, result);
+
+            if (Thread.currentThread().isInterrupted())
+                throw new RuntimeException("Interrupted");
         }
         state.getLambdaParameters().remove(firstParamName);
         state.getLambdaParameters().remove(secondParamName);

@@ -11,12 +11,13 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class InterpreterTest {
 
     @Test
     public void syntaxErrorFail() {
         ProgramResult result = new Interpreter().process(
-                "unknown command");
+                "unknown command").get();
         assertFalse(result.getErrors().isEmpty());
     }
 
@@ -24,7 +25,7 @@ public class InterpreterTest {
     public void globalVarDoubleSuccess() {
         ProgramResult result = new Interpreter().process(
                 "var x = 5.0 " +
-                        "out x");
+                        "out x").get();
         assertTrue(result.getErrors().isEmpty());
         assertEquals(result.getOutput(), "5.0");
     }
@@ -33,7 +34,7 @@ public class InterpreterTest {
     public void globalVarSequenceSuccess() {
         ProgramResult result = new Interpreter().process(
                 "var x = {1, 3} " +
-                        "out reduce(x , 0 , n m -> n + m)");
+                        "out reduce(x , 0 , n m -> n + m)").get();
         assertTrue(result.getErrors().isEmpty());
         assertEquals(result.getOutput(), "6.0");
     }
@@ -43,7 +44,7 @@ public class InterpreterTest {
         ProgramResult result = new Interpreter().process(
                 "var x = {1, 3} " +
                         "var y = x " +
-                        "out reduce(y , 0 , n m -> n + m)");
+                        "out reduce(y , 0 , n m -> n + m)").get();
         assertTrue(result.getErrors().isEmpty());
         assertEquals(result.getOutput(), "6.0");
     }
@@ -52,7 +53,7 @@ public class InterpreterTest {
     public void globalVarSequenceAsDoubleFail() {
         ProgramResult result = new Interpreter().process(
                 "var x = {1, 3} " +
-                        "out reduce({0, 4} , x , n m -> n + m)");
+                        "out reduce({0, 4} , x , n m -> n + m)").get();
         assertFalse(result.getErrors().isEmpty());
     }
 
@@ -60,7 +61,7 @@ public class InterpreterTest {
     public void globalVarDoubleAsSequenceFail() {
         ProgramResult result = new Interpreter().process(
                 "var x = 6 " +
-                        "out reduce(x , 3 , n m -> n + m)");
+                        "out reduce(x , 3 , n m -> n + m)").get();
         assertFalse(result.getErrors().isEmpty());
     }
 
@@ -68,7 +69,7 @@ public class InterpreterTest {
     public void globalVarUseBeforeDefFail() {
         ProgramResult result = new Interpreter().process(
                 "out reduce({1 , 10} , x , n m -> n + m) " +
-                        "var x = 6 ");
+                        "var x = 6 ").get();
         assertFalse(result.getErrors().isEmpty());
     }
 
@@ -76,7 +77,7 @@ public class InterpreterTest {
     public void globalVarDoubleDefFail() {
         ProgramResult result = new Interpreter().process(
                 "var x = {1, 34} " +
-                        "var x = 6 ");
+                        "var x = 6 ").get();
         assertFalse(result.getErrors().isEmpty());
     }
 
@@ -84,7 +85,7 @@ public class InterpreterTest {
     public void globalVarUseInLambdaFail() {
         ProgramResult result = new Interpreter().process(
                 "var x = 6 " +
-                        "out reduce({1,5} , 3 , n m -> x + m)");
+                        "out reduce({1,5} , 3 , n m -> x + m)").get();
         assertFalse(result.getErrors().isEmpty());
     }
 
@@ -92,7 +93,7 @@ public class InterpreterTest {
     public void globalVarUseAsLambdaParamFail() {
         ProgramResult result = new Interpreter().process(
                 "var x = 6 " +
-                        "out reduce({1,5} , 3 , x m -> m + 1)");
+                        "out reduce({1,5} , 3 , x m -> m + 1)").get();
         assertFalse(result.getErrors().isEmpty());
     }
 
@@ -101,7 +102,7 @@ public class InterpreterTest {
     public void exampleTestSuccess() throws IOException {
         String test = getResourceFileAsString("grammarTest.txt");
         Interpreter interpreter = new Interpreter();
-        ProgramResult result = interpreter.process(test);
+        ProgramResult result = interpreter.process(test).get();
         assertTrue(result.getErrors().isEmpty());
         assertTrue(result.getOutput().startsWith("pi = 3.14"));
     }

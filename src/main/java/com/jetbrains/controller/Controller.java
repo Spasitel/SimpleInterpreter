@@ -2,32 +2,28 @@ package com.jetbrains.controller;
 
 import com.jetbrains.model.Interpreter;
 import com.jetbrains.view.Editor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class Controller {
-    private final Logger logger = LoggerFactory.getLogger(Controller.class);
-    private Interpreter interpreter;
-    private Thread thread = new Thread();
+    private Interpreter interpreter = new Interpreter();
+    private ScheduledFuture<?> scheduledFuture;
     private Editor view;
+    private ScheduledExecutorService service = Executors.newScheduledThreadPool(2);
 
     public Controller() {
-        view = new Editor(this);
-        interpreter = new Interpreter();
+        SwingUtilities.invokeLater(() -> view = new Editor(this));
     }
 
-    public void onInputChange() {
-        thread.interrupt();
-        thread = new Thread(() ->
-        {
-            try {
-                Thread.sleep(2500);
-            } catch (InterruptedException e) {
-                return;
-            }
-            logger.info("running interpreter");
-            view.applyInterpreterResults(interpreter.process(view.getInputText()));
-        });
-        thread.start();
+    public void onInputChange(String program) {
+        if (scheduledFuture != null)
+            scheduledFuture.cancel(true);
+
+        scheduledFuture = service
+                .schedule(new InterpreterWorker(view, interpreter, program), 2500, TimeUnit.MILLISECONDS);
     }
 }
