@@ -3,7 +3,7 @@ package com.jetbrains.common;
 import java.util.Optional;
 
 /**
- *
+ * TODO
  */
 public class ErrorInfo {
     private final String msg;

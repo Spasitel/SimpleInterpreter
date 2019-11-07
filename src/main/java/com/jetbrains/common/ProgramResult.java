@@ -3,6 +3,9 @@ package com.jetbrains.common;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * TODO
+ */
 public class ProgramResult {
     private String output = "";
     private List<ErrorInfo> errors = new ArrayList<>();

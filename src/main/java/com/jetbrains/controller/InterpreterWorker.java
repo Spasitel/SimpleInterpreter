@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.util.Optional;
 
+/**
+ * TODO
+ */
 public class InterpreterWorker extends SwingWorker<Optional<ProgramResult>, Void> {
     private final Logger logger = LoggerFactory.getLogger(InterpreterWorker.class);
 

@@ -12,7 +12,10 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SequenceVisitor extends SimpleBaseVisitor<List<Double>> {
+/**
+ * TODO
+ */
+public class SequenceVisitor extends SimpleBaseVisitor<Sequence> {
     private final Logger logger = LoggerFactory.getLogger(SequenceVisitor.class);
 
     private ProgramState state;
@@ -32,23 +35,21 @@ public class SequenceVisitor extends SimpleBaseVisitor<List<Double>> {
     }
 
     @Override
-    public List<Double> visitSequenceDef(SimpleParser.SequenceDefContext ctx) {
+    public Sequence visitSequenceDef(SimpleParser.SequenceDefContext ctx) {
         int start = getIntValue(ctx.start);
         int end = getIntValue(ctx.end);
 
         if (start > end)
             throw new InterpretationException("Wrong sequence: {" + start + " ," + end + "}", ctx);
-        List<Double> result = new ArrayList<>();
-        for (int i = start; i <= end; i++)
-            result.add((double) i);
+        Sequence result = new Sequence(start, end);
 
-        logger.trace("{} := sequence size:{} first:{} last:{}", ctx.getText(), result.size(), result.get(0),
-                result.get(result.size() - 1));
+        logger.trace("{} := sequence size:{} first:{} last:{}", ctx.getText(), result.size(), result.getFirst(),
+                result.getLast());
         return result;
     }
 
     private int getIntValue(SimpleParser.ExprContext start) {
-        double value = doubleVisitor.visit(start);
+        double value = doubleVisitor.visitDouble(start);
         if ((value == Math.floor(value)) && !Double.isInfinite(value)) {
             return (int) value;
         }
@@ -56,15 +57,15 @@ public class SequenceVisitor extends SimpleBaseVisitor<List<Double>> {
     }
 
     @Override
-    public List<Double> visitVariable(SimpleParser.VariableContext ctx) {
+    public Sequence visitVariable(SimpleParser.VariableContext ctx) {
         TerminalNode identifier = ctx.IDENTIFIER();
-        doubleVisitor.commonVariableUseCheck(identifier);
+        voidVisitor.commonVariableUseCheck(identifier);
 
         String name = identifier.getText();
         if (state.getGlobalSequenceVariables().containsKey(name)) {
-            List<Double> result = state.getGlobalSequenceVariables().get(name);
-            logger.trace("{} := sequence size:{} first:{} last:{}", ctx.getText(), result.size(), result.get(0),
-                    result.get(result.size() - 1));
+            Sequence result = state.getGlobalSequenceVariables().get(name);
+            logger.trace("{} := sequence size:{} first:{} last:{}", ctx.getText(), result.size(), result.getFirst(),
+                    result.getLast());
             return result;
         }
 
@@ -72,41 +73,41 @@ public class SequenceVisitor extends SimpleBaseVisitor<List<Double>> {
     }
 
     @Override
-    public List<Double> visitMap(SimpleParser.MapContext ctx) {
+    public Sequence visitMap(SimpleParser.MapContext ctx) {
         Token param = ctx.param;
         voidVisitor.commonNewVariableCheck(param);
 
-        List<Double> argument = visit(ctx.arg);
+        Sequence argument = visit(ctx.arg);
         List<Double> result = new ArrayList<>();
         for (double element : argument) {
             state.getLambdaParameters().put(param.getText(), element);
-            result.add(doubleVisitor.visit(ctx.lambda));
+            result.add(doubleVisitor.visitDouble(ctx.lambda));
             if (Thread.currentThread().isInterrupted())
                 throw new RuntimeException("Interrupted");
         }
         state.getLambdaParameters().remove(param.getText());
         logger.trace("{} := sequence size:{} first:{} last:{}", ctx.getText(), result.size(), result.get(0),
                 result.get(result.size() - 1));
-        return result;
+        return new Sequence(result);
     }
 
     @Override
-    public List<Double> visitParentheses(SimpleParser.ParenthesesContext ctx) {
+    public Sequence visitParentheses(SimpleParser.ParenthesesContext ctx) {
         return visit(ctx.arg);
     }
 
     @Override
-    public List<Double> visitReduce(SimpleParser.ReduceContext ctx) {
+    public Sequence visitReduce(SimpleParser.ReduceContext ctx) {
         throw new InterpretationException("Type mismatch: expected sequence but was number", ctx);
     }
 
     @Override
-    public List<Double> visitConstant(SimpleParser.ConstantContext ctx) {
+    public Sequence visitConstant(SimpleParser.ConstantContext ctx) {
         throw new InterpretationException("Type mismatch: expected sequence but was number", ctx);
     }
 
     @Override
-    public List<Double> visitOpExpression(SimpleParser.OpExpressionContext ctx) {
+    public Sequence visitOpExpression(SimpleParser.OpExpressionContext ctx) {
         throw new InterpretationException("Type mismatch: expected sequence but was number", ctx);
     }
 }

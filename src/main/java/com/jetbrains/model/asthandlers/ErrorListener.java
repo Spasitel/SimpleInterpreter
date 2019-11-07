@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
+/**
+ * TODO
+ */
 public class ErrorListener implements ANTLRErrorListener {
     private final Logger logger = LoggerFactory.getLogger(ErrorListener.class);
     private final List<ErrorInfo> errors = new ArrayList<>();
