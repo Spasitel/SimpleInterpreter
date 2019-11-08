@@ -13,7 +13,7 @@ import java.util.BitSet;
 import java.util.List;
 
 /**
- * TODO
+ * Listener for handling parsing errors (e.g. syntax error)
  */
 public class ErrorListener implements ANTLRErrorListener {
     private final Logger logger = LoggerFactory.getLogger(ErrorListener.class);

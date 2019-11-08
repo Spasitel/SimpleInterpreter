@@ -7,7 +7,10 @@ import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 /**
- * TODO
+ * Represent sequence in interpretation
+ * @implNote Could be stored in two different states: <br>
+ *     as integer sequence form <b>start</b> to <b>finish</b> inclusive or <br>
+ *     as array of doubles
  */
 public class Sequence implements Iterable<Double> {
 

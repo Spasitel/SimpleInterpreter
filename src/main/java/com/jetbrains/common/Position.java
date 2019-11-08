@@ -4,7 +4,11 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
 /**
- * TODO
+ * Position of error in program. Represents sequence of consecutive symbols.
+ * @implNote point to start symbol could be stored in two kinds:<br>
+ *           as startIndex - position of symbol from start of program or <br>
+ *           as line and position in line
+ *
  */
 public class Position {
     private int startIndex = -1;

@@ -10,13 +10,13 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * TODO
+ * Controls the interaction between GUI and interpreter
  */
 public class Controller {
     private Interpreter interpreter = new Interpreter();
     private ScheduledFuture<?> scheduledFuture;
     private Editor view;
-    private ScheduledExecutorService service = Executors.newScheduledThreadPool(2);
+    private ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
 
     public Controller() {
         SwingUtilities.invokeLater(() -> view = new Editor(this));
@@ -26,7 +26,7 @@ public class Controller {
         if (scheduledFuture != null)
             scheduledFuture.cancel(true);
 
-        scheduledFuture = service
-                .schedule(new InterpreterWorker(view, interpreter, program), 2500, TimeUnit.MILLISECONDS);
+        scheduledFuture = service.schedule(
+                new InterpreterWorker(view, interpreter, program), 2500, TimeUnit.MILLISECONDS);
     }
 }

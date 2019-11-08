@@ -12,9 +12,6 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.util.List;
 
-/**
- * TODO
- */
 public class Editor extends JFrame {
     private static final SimpleAttributeSet BLACK_FONT = new SimpleAttributeSet();
     private static final SimpleAttributeSet RED_FONT = new SimpleAttributeSet();
@@ -44,9 +41,6 @@ public class Editor extends JFrame {
         }
     };
 
-    /**
-     * TODO
-     */
     public Editor(Controller controller) throws HeadlessException {
         super("Simple interpreter");
         this.controller = controller;
@@ -101,9 +95,6 @@ public class Editor extends JFrame {
         }
     }
 
-    /**
-     * TODO
-     */
     public void applyInterpreterResults(ProgramResult result) {
         if (result.getErrors().isEmpty()) {
             SwingUtilities.invokeLater(() -> {

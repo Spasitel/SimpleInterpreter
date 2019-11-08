@@ -9,10 +9,12 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 /**
- * TODO
+ * Visitor for AST nodes which returns numerical value. For simplicity they all stored as double.
+ * @implNote Logical generic based implementation of <code>SimpleBaseVisitor&lt;Double&gt;</code> has bad performance.
+ * During interpretation a lot of boxed values is generated and GC affects GUI. In current implementation all visitors
+ * store their results in local field {@link visitResult} and caller get result from that field. To avoid wrong usage
+ * {@link DoubleVisitor} is created.
  */
 public class DoubleVisitorImpl extends SimpleBaseVisitor<Void> implements DoubleVisitor {
     private final Logger logger = LoggerFactory.getLogger(DoubleVisitorImpl.class);
@@ -20,11 +22,7 @@ public class DoubleVisitorImpl extends SimpleBaseVisitor<Void> implements Double
     private ProgramState state;
     private VoidVisitor voidVisitor;
     private SequenceVisitor sequenceVisitor;
-    /**
-     * TODO!!!
-     */
     private double visitResult;
-
 
     DoubleVisitorImpl(ProgramState state) {
         this.state = state;

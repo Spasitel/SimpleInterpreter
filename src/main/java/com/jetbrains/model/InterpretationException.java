@@ -4,24 +4,15 @@ import com.jetbrains.common.Position;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
-/**
- * TODO
- */
 public class InterpretationException extends RuntimeException {
     private final String message;
     private final Position position;
 
-    /**
-     * TODO
-     */
     public InterpretationException(String message, Token symbol) {
         this.message = message;
         this.position = new Position(symbol);
     }
 
-    /**
-     * TODO
-     */
     public InterpretationException(String message, ParserRuleContext context) {
         this.message = message;
         this.position = new Position(context);

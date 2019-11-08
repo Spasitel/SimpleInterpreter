@@ -15,14 +15,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
-/**
- * TODO
- */
 public class Interpreter {
     private final Logger logger = LoggerFactory.getLogger(Interpreter.class);
 
     /**
-     * TODO
+     * Parse and interpret given program
+     * @param program code of the program
+     * @return {@link ProgramResult} - result of interpretation or<br>
+     *         empty - if interpretation was interrupted
      */
     public Optional<ProgramResult> process(String program) {
         CharStream input = CharStreams.fromString(program);

@@ -10,11 +10,12 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Map;
 
 /**
- * TODO
+ * Visitor for AST nodes which returns no value. <br>
+ * <br>
+ * This is main visitor because the AST root <b>program</b> returns no value an should be visited by this class.
  */
 public class VoidVisitor extends SimpleBaseVisitor<Void> {
     private final Logger logger = LoggerFactory.getLogger(VoidVisitor.class);
@@ -28,7 +29,9 @@ public class VoidVisitor extends SimpleBaseVisitor<Void> {
     }
 
     /**
-     * TODO
+     * Create visitors for interpretation
+     * @param programState shared mutable state. Result of interpretation is stored here
+     * @return main visitor
      */
     public static VoidVisitor createVisitors(ProgramState programState) {
         VoidVisitor voidVisitor = new VoidVisitor(programState);

@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO
+ * Visitor for AST nodes which returns sequence value
  */
 public class SequenceVisitor extends SimpleBaseVisitor<Sequence> {
     private final Logger logger = LoggerFactory.getLogger(SequenceVisitor.class);

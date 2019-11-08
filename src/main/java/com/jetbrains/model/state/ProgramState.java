@@ -7,7 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Mutable current interpretation state
+ * Mutable current interpretation state. Includes value of global and lambda variables, program output and
+ * interpretation errors.
  */
 public class ProgramState {
     private ProgramResult result = new ProgramResult();

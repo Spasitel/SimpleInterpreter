@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO
+ * Result of parsing and interpretation. Contains output of program or errors.
  */
 public class ProgramResult {
     private String output = "";
