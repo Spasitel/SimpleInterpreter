@@ -1,77 +1,79 @@
 package com.jetbrains.model.asthandlers;
 
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
+/**
+ * TODO
+ */
 public class Sequence implements Iterable<Double> {
 
-    final List<Double> list;
-    final int start;
-    //inclusive
-    final int finish;
+    private final double[] array;
+    private final int start;
+    private final int finish; //inclusive
 
-    public Sequence(List<Double> list) {
-        this.list = list;
+    Sequence(double[] list) {
+        this.array = list;
         this.start = 0;
         this.finish = 0;
     }
 
-    public Sequence(int start, int finish) {
-        this.list = null;
+    Sequence(int start, int finish) {
+        this.array = null;
         this.start = start;
         this.finish = finish;
     }
 
     @Override
     public Iterator<Double> iterator() {
-        if (list == null)
+        if (array == null)
             return IntStream.range(start, finish + 1).asDoubleStream().iterator();
         else
-            return list.iterator();
+            return Arrays.stream(array).iterator();
     }
 
     @Override
     public void forEach(Consumer<? super Double> action) {
-        if (list == null) {
+        if (array == null) {
             IntStream.range(start, finish + 1).asDoubleStream().boxed().forEach(action);
         } else {
-            list.forEach(action);
+            Arrays.stream(array).boxed().forEach(action);
         }
     }
 
     @Override
     public Spliterator<Double> spliterator() {
-        if (list == null) {
+        if (array == null) {
             return IntStream.range(start, finish + 1).asDoubleStream().boxed().spliterator();
         } else {
-            return list.spliterator();
+            return Arrays.stream(array).spliterator();
         }
     }
 
-    public int size() {
-        if (list == null) {
+    int size() {
+        if (array == null) {
             return finish - start + 1;
         } else {
-            return list.size();
+            return array.length;
         }
     }
 
-    public double getFirst() {
-        if (list == null) {
+    double getFirst() {
+        if (array == null) {
             return start;
         } else {
-            return list.get(0);
+            return array[0];
         }
     }
 
-    public double getLast() {
-        if (list == null) {
+    double getLast() {
+        if (array == null) {
             return finish;
         } else {
-            return list.get(list.size() - 1);
+            return array[array.length - 1];
         }
     }
 }

@@ -9,9 +9,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * TODO
  */
@@ -78,17 +75,19 @@ public class SequenceVisitor extends SimpleBaseVisitor<Sequence> {
         voidVisitor.commonNewVariableCheck(param);
 
         Sequence argument = visit(ctx.arg);
-        List<Double> result = new ArrayList<>();
+        double[] result = new double[argument.size()];
+        int i = 0;
         for (double element : argument) {
             state.getLambdaParameters().put(param.getText(), element);
-            result.add(doubleVisitor.visitDouble(ctx.lambda));
+            result[i++] = doubleVisitor.visitDouble(ctx.lambda);
             if (Thread.currentThread().isInterrupted())
                 throw new RuntimeException("Interrupted");
         }
         state.getLambdaParameters().remove(param.getText());
-        logger.trace("{} := sequence size:{} first:{} last:{}", ctx.getText(), result.size(), result.get(0),
-                result.get(result.size() - 1));
-        return new Sequence(result);
+        Sequence resultSequence = new Sequence(result);
+        logger.trace("{} := sequence size:{} first:{} last:{}", ctx.getText(), resultSequence.size(),
+                resultSequence.getFirst(), resultSequence.getLast());
+        return resultSequence;
     }
 
     @Override
