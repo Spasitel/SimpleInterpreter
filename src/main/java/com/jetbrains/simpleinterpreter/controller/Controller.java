@@ -18,7 +18,7 @@ public class Controller {
     private Editor view;
     private ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
 
-    public Controller() {
+    public void showGui() {
         SwingUtilities.invokeLater(() -> view = new Editor(this));
     }
 
@@ -28,5 +28,9 @@ public class Controller {
 
         scheduledFuture = service.schedule(
                 new InterpreterWorker(view, interpreter, program), 2000, TimeUnit.MILLISECONDS);
+    }
+
+    public void setView(Editor editor) {
+        view = editor;
     }
 }

@@ -49,6 +49,7 @@ public class Editor extends JFrame {
         this.controller = controller;
 
         inputPane = new JTextPane();
+        inputPane.setName("input");
         JScrollPane editorScrollPane = new JScrollPane(inputPane);
 
         StyledDocument doc = inputPane.getStyledDocument();
@@ -56,6 +57,7 @@ public class Editor extends JFrame {
         doc.addDocumentListener(listener);
 
         resultArea = new JTextArea();
+        resultArea.setName("output");
         resultArea.setBackground(Color.LIGHT_GRAY);
         JScrollPane resultScrollPane = new JScrollPane(resultArea);
         resultArea.setEditable(false);
