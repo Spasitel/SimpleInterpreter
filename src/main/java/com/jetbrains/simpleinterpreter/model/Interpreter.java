@@ -20,9 +20,10 @@ public class Interpreter {
 
     /**
      * Parse and interpret given program
+     *
      * @param program code of the program
      * @return {@link ProgramResult} - result of interpretation or<br>
-     *         empty - if interpretation was interrupted
+     * empty - if interpretation was interrupted
      */
     public Optional<ProgramResult> process(String program) {
         ErrorListener errorListener = new ErrorListener();
@@ -48,9 +49,10 @@ public class Interpreter {
                 programResult = new ProgramResult();
                 programResult.getErrors().add(new ErrorInfo(e.getMessage(), e.getPosition()));
             } catch (Exception e) {
-                logger.error("Exception: " + e.getMessage());
+                String message = e.getClass().getSimpleName() + ": " + e.getMessage();
+                logger.error(message);
                 programResult = new ProgramResult();
-                programResult.getErrors().add(new ErrorInfo(e.getMessage()));
+                programResult.getErrors().add(new ErrorInfo(message));
             }
         }
 

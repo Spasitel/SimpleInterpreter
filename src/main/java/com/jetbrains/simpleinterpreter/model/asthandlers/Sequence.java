@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 /**
  * Represent sequence in interpretation
@@ -15,8 +15,8 @@ import java.util.stream.IntStream;
 public class Sequence implements Iterable<Double> {
 
     private final double[] array;
-    private final int start;
-    private final int finish; //inclusive
+    private final long start;
+    private final long finish; //inclusive
 
     Sequence(double[] list) {
         this.array = list;
@@ -24,7 +24,7 @@ public class Sequence implements Iterable<Double> {
         this.finish = 0;
     }
 
-    Sequence(int start, int finish) {
+    Sequence(long start, long finish) {
         this.array = null;
         this.start = start;
         this.finish = finish;
@@ -33,7 +33,7 @@ public class Sequence implements Iterable<Double> {
     @Override
     public Iterator<Double> iterator() {
         if (array == null)
-            return IntStream.range(start, finish + 1).asDoubleStream().iterator();
+            return LongStream.range(start, finish + 1).asDoubleStream().iterator();
         else
             return Arrays.stream(array).iterator();
     }
@@ -41,7 +41,7 @@ public class Sequence implements Iterable<Double> {
     @Override
     public void forEach(Consumer<? super Double> action) {
         if (array == null) {
-            IntStream.range(start, finish + 1).asDoubleStream().boxed().forEach(action);
+            LongStream.range(start, finish + 1).asDoubleStream().boxed().forEach(action);
         } else {
             Arrays.stream(array).boxed().forEach(action);
         }
@@ -50,7 +50,7 @@ public class Sequence implements Iterable<Double> {
     @Override
     public Spliterator<Double> spliterator() {
         if (array == null) {
-            return IntStream.range(start, finish + 1).asDoubleStream().boxed().spliterator();
+            return LongStream.range(start, finish + 1).asDoubleStream().boxed().spliterator();
         } else {
             return Arrays.stream(array).spliterator();
         }
@@ -58,7 +58,7 @@ public class Sequence implements Iterable<Double> {
 
     int size() {
         if (array == null) {
-            return finish - start + 1;
+            return (int) (finish - start + 1);
         } else {
             return array.length;
         }

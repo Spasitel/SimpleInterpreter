@@ -18,8 +18,8 @@ expr
     | IDENTIFIER                                        #variable
     | '{' start=expr ',' end=expr '}'                   #sequenceDef
     | (sign='-')?NUMBER                                 #constant
-    | 'map(' arg=expr ',' param=IDENTIFIER '->' lambda=expr ')'                                             #map
-    | 'reduce(' arg=expr ',' start=expr',' firstParam=IDENTIFIER secondParam=IDENTIFIER '->' lambda=expr')' #reduce
+    | 'map' '(' arg=expr ',' param=IDENTIFIER '->' lambda=expr ')'                                             #map
+    | 'reduce' '(' arg=expr ',' start=expr',' firstParam=IDENTIFIER secondParam=IDENTIFIER '->' lambda=expr')' #reduce
     ;
 
 STRING

@@ -33,11 +33,15 @@ public class SequenceVisitor extends SimpleBaseVisitor<Sequence> {
 
     @Override
     public Sequence visitSequenceDef(SimpleParser.SequenceDefContext ctx) {
-        int start = getIntValue(ctx.start);
-        int end = getIntValue(ctx.end);
+        long start = getIntValue(ctx.start);
+        long end = getIntValue(ctx.end);
 
         if (start > end)
             throw new InterpretationException("Wrong sequence: {" + start + " ," + end + "}", ctx);
+        if (end - start >= Integer.MAX_VALUE)
+            throw new InterpretationException(
+                    "Sequence is too large: {" + start + " ," + end + "}, size: " + (end - start + 1), ctx);
+
         Sequence result = new Sequence(start, end);
 
         logger.trace("{} := sequence size:{} first:{} last:{}", ctx.getText(), result.size(), result.getFirst(),
@@ -45,10 +49,10 @@ public class SequenceVisitor extends SimpleBaseVisitor<Sequence> {
         return result;
     }
 
-    private int getIntValue(SimpleParser.ExprContext start) {
+    private long getIntValue(SimpleParser.ExprContext start) {
         double value = doubleVisitor.visitDouble(start);
         if ((value == Math.floor(value)) && !Double.isInfinite(value)) {
-            return (int) value;
+            return (long) value;
         }
         throw new InterpretationException("Expected integer but was: " + value, start);
     }

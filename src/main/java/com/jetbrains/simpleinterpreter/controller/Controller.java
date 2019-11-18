@@ -27,7 +27,7 @@ public class Controller {
             scheduledFuture.cancel(true);
 
         scheduledFuture = service.schedule(
-                new InterpreterWorker(view, interpreter, program), 2000, TimeUnit.MILLISECONDS);
+                new InterpreterWorker(view, interpreter, program), 500, TimeUnit.MILLISECONDS);
     }
 
     public void setView(Editor editor) {
