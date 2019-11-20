@@ -40,3 +40,6 @@ dependencies {
     testCompile group: 'org.assertj', name: 'assertj-swing-junit', version: '3.9.2'
     testCompile 'org.mockito:mockito-core:3.1.0'
 }
+test{
+    systemProperty 'runAllGuiTests', System.getProperty('runAllGuiTests')
+}

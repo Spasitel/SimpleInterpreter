@@ -1,15 +1,13 @@
 package com.jetbrains.simpleinterpreter.view;
 
+import com.jetbrains.simpleinterpreter.SystemTest;
 import com.jetbrains.simpleinterpreter.common.ErrorInfo;
 import com.jetbrains.simpleinterpreter.common.ProgramResult;
 import com.jetbrains.simpleinterpreter.controller.Controller;
 import org.assertj.swing.edt.FailOnThreadViolationRepaintManager;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.FrameFixture;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -35,6 +33,7 @@ public class EditorTest {
 
     @Test
     public void editorCallControllerOnChangeSuccess() {
+        Assume.assumeFalse(SystemTest.isUIControlDisable());
         window.textBox("input").enterText("out 54");
         verify(controller, times(6)).onInputChange(any());
         verify(controller).onInputChange("out 54");

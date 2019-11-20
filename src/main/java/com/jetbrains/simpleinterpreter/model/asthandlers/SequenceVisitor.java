@@ -96,7 +96,7 @@ public class SequenceVisitor extends SimpleBaseVisitor<Sequence> {
 
     @Override
     public Sequence visitParentheses(SimpleParser.ParenthesesContext ctx) {
-        return visit(ctx.arg);
+        throw new InterpretationException("Type mismatch: expected sequence but was number", ctx);
     }
 
     @Override

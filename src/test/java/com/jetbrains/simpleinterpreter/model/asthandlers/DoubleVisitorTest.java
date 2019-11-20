@@ -21,8 +21,8 @@ public class DoubleVisitorTest {
 
     @Before
     public void initVisitors() {
-        state = new ProgramState();
-        voidVisitor = VoidVisitor.createVisitors(state);
+        voidVisitor = VoidVisitor.createVisitors();
+        state = voidVisitor.getState();
     }
 
     @Test

@@ -42,11 +42,13 @@ public class InterpreterTest {
     @Test
     public void globalVarCopySuccess() {
         ProgramResult result = new Interpreter().process(
-                "var x = {1, 3} " +
+                "var x0 = 5 " +
+                        "var y0 = x0 " +
+                        "var x = {1, 3} " +
                         "var y = x " +
-                        "out reduce(y , 0 , n m -> n + m)").get();
+                        "out reduce(y , y0 , n m -> n + m)").get();
         assertTrue(result.getErrors().isEmpty());
-        assertEquals(result.getOutput(), "6.0");
+        assertEquals(result.getOutput(), "11.0");
     }
 
     @Test
@@ -74,12 +76,22 @@ public class InterpreterTest {
     }
 
     @Test
-    public void globalVarDoubleDefFail() {
+    public void globalVarDuplicateFail() {
         ProgramResult result = new Interpreter().process(
                 "var x = {1, 34} " +
-                        "var x = 6 ").get();
+                        "var x = 6 " +
+                        "out x").get();
         assertFalse(result.getErrors().isEmpty());
     }
+
+    @Test
+    public void unknownGlobalVarToVarFail() {
+        ProgramResult result = new Interpreter().process(
+                "var x = y " +
+                        "out x").get();
+        assertFalse(result.getErrors().isEmpty());
+    }
+
 
     @Test
     public void globalVarUseInLambdaFail() {
@@ -93,7 +105,8 @@ public class InterpreterTest {
     public void globalVarUseAsLambdaParamFail() {
         ProgramResult result = new Interpreter().process(
                 "var x = 6 " +
-                        "out reduce({1,5} , 3 , x m -> m + 1)").get();
+                        "out reduce({1,5} , 3 , x m -> m + 1) " +
+                        "out x").get();
         assertFalse(result.getErrors().isEmpty());
     }
 

@@ -6,7 +6,6 @@ import com.jetbrains.simpleinterpreter.model.antlrgen.SimpleLexer;
 import com.jetbrains.simpleinterpreter.model.antlrgen.SimpleParser;
 import com.jetbrains.simpleinterpreter.model.asthandlers.ErrorListener;
 import com.jetbrains.simpleinterpreter.model.asthandlers.VoidVisitor;
-import com.jetbrains.simpleinterpreter.model.state.ProgramState;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -39,11 +38,9 @@ public class Interpreter {
             programResult.getErrors().addAll(errorListener.getErrors());
         } else {
             try {
-                ProgramState programState = new ProgramState();
-                VoidVisitor visitor = VoidVisitor.createVisitors(programState);
-                visitor.visit(tree);//interpreting program
+                VoidVisitor visitor = VoidVisitor.createVisitors();
+                programResult = visitor.interpret(tree);
                 logger.info("Interpretation successfully done");
-                programResult = programState.getResult();
             } catch (InterpretationException e) {
                 logger.error("Interpretation error: " + e.getMessage());
                 programResult = new ProgramResult();

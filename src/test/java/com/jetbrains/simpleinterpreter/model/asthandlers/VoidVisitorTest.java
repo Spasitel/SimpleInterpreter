@@ -19,10 +19,24 @@ public class VoidVisitorTest {
     private VoidVisitor voidVisitor;
     private ProgramState state;
 
+    static ParseTree getParseTree(String program) {
+        CharStream codePointCharStream = CharStreams.fromString(program);
+        SimpleLexer lex = new SimpleLexer(codePointCharStream); // transforms characters into tokens
+        lex.removeErrorListeners();
+        CommonTokenStream tokens = new CommonTokenStream(lex); // a token stream
+        SimpleParser parser = new SimpleParser(tokens);
+        parser.removeErrorListeners();
+        ErrorListener listener = new ErrorListener();
+        parser.addErrorListener(listener);
+        ParseTree parseTree = parser.program();
+        assertTrue(listener.getErrors().isEmpty());
+        return parseTree;
+    }
+
     @Before
     public void initVisitors() {
-        state = new ProgramState();
-        voidVisitor = VoidVisitor.createVisitors(state);
+        voidVisitor = VoidVisitor.createVisitors();
+        state = voidVisitor.getState();
     }
 
     @Test
@@ -89,18 +103,13 @@ public class VoidVisitorTest {
         assertTrue(state.getLambdaParameters().isEmpty());
     }
 
-    static ParseTree getParseTree(String program) {
-        CharStream codePointCharStream = CharStreams.fromString(program);
-        SimpleLexer lex = new SimpleLexer(codePointCharStream); // transforms characters into tokens
-        lex.removeErrorListeners();
-        CommonTokenStream tokens = new CommonTokenStream(lex); // a token stream
-        SimpleParser parser = new SimpleParser(tokens);
-        parser.removeErrorListeners();
-        ErrorListener listener = new ErrorListener();
-        parser.addErrorListener(listener);
-        ParseTree parseTree = parser.program();
-        assertTrue(listener.getErrors().isEmpty());
-        return parseTree;
+    @Test
+    public void deadCodeRemovedSuccess() {
+        ParseTree tree = getParseTree("var x = 5.0 var y = {1,3} out 6");
+        voidVisitor.interpret(tree);
+        assertTrue(state.getResult().getErrors().isEmpty());
+        assertTrue(state.getGlobalDoubleVariables().isEmpty());
+        assertTrue(state.getGlobalSequenceVariables().isEmpty());
+        assertTrue(state.getLambdaParameters().isEmpty());
     }
-
 }

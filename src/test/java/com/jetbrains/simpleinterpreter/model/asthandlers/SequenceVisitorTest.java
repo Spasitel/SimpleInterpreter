@@ -21,8 +21,8 @@ public class SequenceVisitorTest {
 
     @Before
     public void initVisitors() {
-        state = new ProgramState();
-        voidVisitor = VoidVisitor.createVisitors(state);
+        voidVisitor = VoidVisitor.createVisitors();
+        state = voidVisitor.getState();
     }
 
     @Test
@@ -59,6 +59,12 @@ public class SequenceVisitorTest {
         voidVisitor.visit(tree);
     }
 
+    @Test(expected = InterpretationException.class)
+    public void sequenceDefTooLargeFail() {
+        ParseTree tree = VoidVisitorTest.getParseTree("var x = {0 , 10^10}");
+        voidVisitor.visit(tree);
+    }
+
     @Test
     public void mapSuccess() {
         ParseTree tree = VoidVisitorTest.getParseTree("var x = map({1 , 5}, n -> n-1)");
@@ -72,6 +78,25 @@ public class SequenceVisitorTest {
         ParseTree tree = VoidVisitorTest.getParseTree("var x = map( 5, n->n)");
         voidVisitor.visit(tree);
     }
+
+    @Test(expected = InterpretationException.class)
+    public void mapParenthesesArgFail() {
+        ParseTree tree = VoidVisitorTest.getParseTree("var x = map(({1,3}), n->n)");
+        voidVisitor.visit(tree);
+    }
+
+    @Test(expected = InterpretationException.class)
+    public void mapReduceArgFail() {
+        ParseTree tree = VoidVisitorTest.getParseTree("var x = map(reduce({1,3}, 0, x y -> x+y), n->n)");
+        voidVisitor.visit(tree);
+    }
+
+    @Test(expected = InterpretationException.class)
+    public void mapOpArgFail() {
+        ParseTree tree = VoidVisitorTest.getParseTree("var x = map(5*10, n->n)");
+        voidVisitor.visit(tree);
+    }
+
 
     @Test(expected = InterpretationException.class)
     public void mapLambdaSequenceFail() {

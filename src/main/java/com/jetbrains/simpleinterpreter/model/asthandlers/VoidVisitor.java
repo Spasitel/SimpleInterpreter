@@ -1,5 +1,6 @@
 package com.jetbrains.simpleinterpreter.model.asthandlers;
 
+import com.jetbrains.simpleinterpreter.common.ProgramResult;
 import com.jetbrains.simpleinterpreter.model.InterpretationException;
 import com.jetbrains.simpleinterpreter.model.antlrgen.SimpleBaseVisitor;
 import com.jetbrains.simpleinterpreter.model.antlrgen.SimpleParser;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Visitor for AST nodes which returns no value. <br>
@@ -19,10 +21,10 @@ import java.util.Map;
  */
 public class VoidVisitor extends SimpleBaseVisitor<Void> {
     private final Logger logger = LoggerFactory.getLogger(VoidVisitor.class);
-
     private ProgramState state;
     private DoubleVisitor doubleVisitor;
     private SequenceVisitor sequenceVisitor;
+    private Set<SimpleParser.VarStmtContext> deadCode;
 
     private VoidVisitor(ProgramState state) {
         this.state = state;
@@ -30,10 +32,11 @@ public class VoidVisitor extends SimpleBaseVisitor<Void> {
 
     /**
      * Create visitors for interpretation
-     * @param programState shared mutable state. Result of interpretation is stored here
+     *
      * @return main visitor
      */
-    public static VoidVisitor createVisitors(ProgramState programState) {
+    public static VoidVisitor createVisitors() {
+        ProgramState programState = new ProgramState();
         VoidVisitor voidVisitor = new VoidVisitor(programState);
         DoubleVisitorImpl doubleVisitor = new DoubleVisitorImpl(programState);
         SequenceVisitor sequenceVisitor = new SequenceVisitor(programState);
@@ -48,6 +51,10 @@ public class VoidVisitor extends SimpleBaseVisitor<Void> {
         sequenceVisitor.setDoubleVisitor(doubleVisitor);
 
         return voidVisitor;
+    }
+
+    ProgramState getState() {
+        return state;
     }
 
     private void setDoubleVisitor(DoubleVisitor doubleVisitor) {
@@ -90,6 +97,10 @@ public class VoidVisitor extends SimpleBaseVisitor<Void> {
     @Override
     public Void visitVarStmt(SimpleParser.VarStmtContext ctx) {
         commonNewVariableCheck(ctx.IDENTIFIER().getSymbol());
+        if (deadCode != null && deadCode.contains(ctx)) {
+            logger.trace("skip dead code: {}", ctx.getText());
+            return null;
+        }
 
         String varName = ctx.IDENTIFIER().getText();
         Map<String, Sequence> globalSequenceVariables = state.getGlobalSequenceVariables();
@@ -147,5 +158,13 @@ public class VoidVisitor extends SimpleBaseVisitor<Void> {
 
         if (!state.getLambdaParameters().isEmpty() && isGlobal)
             throw new InterpretationException("Access to global variable from lambda", identifier.getSymbol());
+    }
+
+    public ProgramResult interpret(ParseTree tree) {
+        DeadCodeVisitor deadCodeVisitor = new DeadCodeVisitor();
+        deadCodeVisitor.visit(tree);
+        deadCode = deadCodeVisitor.getDeadCode();
+        visit(tree);
+        return state.getResult();
     }
 }
